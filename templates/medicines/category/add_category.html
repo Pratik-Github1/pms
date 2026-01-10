@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+{% block title %}Add Category | Panda Medicine{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h3 class="page-title">
+        Category Details
+    </h3>
+</div>
+<div class="row">
+    <div class="col-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div id="formAlert" class="alert d-none" role="alert"></div>
+
+                    <button type="button"
+                            id="editBtn"
+                            class="btn btn-sm btn-outline-primary d-none"
+                            title="Edit Store Profile">
+                        <i class="mdi mdi-pencil"></i> Edit
+                    </button>
+                </div>
+
+                <form class="forms-sample" id="storeProfileForm">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Store Name</label>
+                                <input type="text" class="form-control" id="store_name" placeholder="Store Name">
+                            </div>
+                        </div>
+                    
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Owner Name</label>
+                                <input type="text" class="form-control" id="owner_name" placeholder="Owner Name">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>GST Number</label>
+                                <input type="text" class="form-control" id="gst_number" placeholder="GST Number">
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Drug License Number</label>
+                                <input type="text" class="form-control" id="drug_license_number" placeholder="Drug License Number">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                           <div class="form-group">
+                                <label>City</label>
+                                <input type="text" class="form-control" id="city" placeholder="City">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>State</label>
+                                <input type="text" class="form-control" id="state" placeholder="State">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                           <div class="form-group">
+                                <label>Pincode</label>
+                                <input type="number" class="form-control" id="pincode" placeholder="Pincode">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Country</label>
+                                <input type="text" class="form-control" id="country" placeholder="Country">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Address</label>
+                                <textarea class="form-control" id="address_line" rows="3"></textarea>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Invoice Footer Note</label>
+                                <textarea class="form-control" id="invoice_footer_note" rows="3"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Store Logo</label>
+                                <input type="file"
+                                    class="form-control"
+                                    id="logo"
+                                    accept="image/*">
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 d-flex align-items-center">
+                            <div class="form-group mb-0">
+                                <img id="logoPreview"
+                                    src=""
+                                    alt="Store Logo"
+                                    style="max-height: 80px; display: none; border-radius: 6px; border: 1px solid #ddd;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="reset" class="btn btn-gradient-danger me-2" id="cancelBtn">
+                        Cancel
+                    </button>
+                    <button type="submit" class="btn btn-gradient-primary me-2" id="submitBtn">
+                        Submit
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

@@ -1,0 +1,30 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Django migrations
+migrations/
+*/migrations/
+
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Ignore database files
+*.sqlite3
+
+# Ignore environment files and folders
+.env
+env/
+
+# Ignore others files
+testing_calls/
+system_logs/
+files/
+data_files/
+xora_logs/
+secrets/

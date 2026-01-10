@@ -1,0 +1,155 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" href="{% static 'assets/vendors/css/vendor.bundle.base.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/css/style.css' %}">
+</head>
+
+<body>
+    <div class="container mt-5">
+        <div class="card p-4">
+            <h3 class="mb-4">Welcome to Dashboard</h3>
+
+            <div id="user-details">
+                <p>Loading user details...</p>
+            </div>
+
+            <button class="btn btn-danger mt-3" id="logoutBtn">Logout</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const userContainer = document.getElementById("user-details");
+            const logoutBtn = document.getElementById("logoutBtn");
+
+            const accessToken = localStorage.getItem("access_token");
+
+            if (!accessToken) {
+                window.location.href = "/loginPage/";
+                return;
+            }
+
+            // Decode JWT payload
+            function decodeJWT(token) {
+                const payload = token.split(".")[1];
+                return JSON.parse(atob(payload));
+            }
+
+            const userData = decodeJWT(accessToken);
+
+            // Display user details
+            userContainer.innerHTML = `
+        <p><strong>User ID:</strong> ${userData.user_id}</p>
+        <p><strong>Full Name:</strong> ${userData.full_name || "-"}</p>
+        <p><strong>Username:</strong> ${userData.username}</p>
+        <p><strong>Email:</strong> ${userData.email}</p>
+        <p><strong>Mobile:</strong> ${userData.mobile_number}</p>
+        <p><strong>Role:</strong> ${userData.role_name}</p>
+        <p><strong>Token Expiry:</strong> ${new Date(userData.exp * 1000).toLocaleString()}</p>
+      `;
+
+            // Logout
+            logoutBtn.addEventListener("click", function () {
+                localStorage.clear();
+                window.location.href = "/loginPage/";
+            });
+
+        });
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const logoutBtn = document.getElementById("logoutBtn");
+
+            function showLogoutMessage(message, type = "error") {
+                let msgBox = document.getElementById("logout-message");
+
+                if (!msgBox) {
+                    msgBox = document.createElement("div");
+                    msgBox.id = "logout-message";
+                    msgBox.style.marginTop = "15px";
+                    msgBox.style.padding = "10px";
+                    msgBox.style.borderRadius = "6px";
+                    msgBox.style.textAlign = "center";
+                    msgBox.style.fontSize = "14px";
+                    document.querySelector(".card").appendChild(msgBox);
+                }
+
+                msgBox.style.color = type === "success" ? "#065f46" : "#991b1b";
+                msgBox.style.backgroundColor = type === "success" ? "#d1fae5" : "#fee2e2";
+                msgBox.style.border =
+                    type === "success"
+                        ? "1px solid #10b981"
+                        : "1px solid #ef4444";
+
+                msgBox.innerText = message;
+            }
+
+            logoutBtn.addEventListener("click", function () {
+
+                const accessToken = localStorage.getItem("access_token");
+                const refreshToken = localStorage.getItem("refresh_token");
+
+                if (!accessToken || !refreshToken) {
+                    localStorage.clear();
+                    window.location.href = "/loginPage/";
+                    return;
+                }
+
+                logoutBtn.innerText = "Logging out...";
+                logoutBtn.disabled = true;
+
+                fetch("/apis/logout", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${accessToken}`
+                    },
+                    body: JSON.stringify({
+                        access_token: accessToken,
+                        refresh_token: refreshToken
+                    })
+                })
+                    .then(res => res.json())
+                    .then(data => {
+
+                        if (!data.status) {
+                            showLogoutMessage(data.message || "Logout failed.");
+                            logoutBtn.innerText = "Logout";
+                            logoutBtn.disabled = false;
+                            return;
+                        }
+
+                        showLogoutMessage("Logged out successfully.", "success");
+
+                        // Clear client-side auth state
+                        localStorage.clear();
+
+                        // Replace history so BACK does not restore dashboard
+                        setTimeout(() => {
+                            window.location.replace("/loginPage/");
+                        }, 800);
+
+                    })
+                    .catch(() => {
+                        showLogoutMessage("Server error during logout.");
+                        logoutBtn.innerText = "Logout";
+                        logoutBtn.disabled = false;
+                    });
+
+            });
+
+        });
+    </script>
+
+</body>
+
+</html>

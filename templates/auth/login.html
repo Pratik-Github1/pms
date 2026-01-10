@@ -1,0 +1,169 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Login | Page</title>
+  <link rel="stylesheet" href="{% static 'assets/vendors/mdi/css/materialdesignicons.min.css' %}">
+  <link rel="stylesheet" href="{% static 'assets/vendors/ti-icons/css/themify-icons.css' %}">
+  <link rel="stylesheet" href="{% static 'assets/vendors/css/vendor.bundle.base.css' %}">
+  <link rel="stylesheet" href="{% static 'assets/vendors/font-awesome/css/font-awesome.min.css' %}">
+  <link rel="stylesheet" href="{% static 'assets/css/style.css' %}">
+  <link rel="shortcut icon" href="{% static 'assets/images/favicon.png' %}">
+</head>
+
+<body>
+  <div class="container-scroller">
+    <div class="container-fluid page-body-wrapper full-page-wrapper">
+      <div class="content-wrapper d-flex align-items-center auth">
+        <div class="row flex-grow">
+          <div class="col-lg-6 mx-auto">
+            <div class="auth-form-light text-left p-5">
+              <h4>Panda Medicine Store</h4>
+              <h6 class="font-weight-light">Sign in to continue.</h6>
+              <form class="pt-3">
+                <div class="form-group">
+                  <input type="email" class="form-control form-control-lg" id="exampleInputEmail1"
+                    placeholder="Username">
+                </div>
+                <div class="form-group">
+                  <input type="password" class="form-control form-control-lg" id="exampleInputPassword1"
+                    placeholder="Password">
+                </div>
+                <div class="mt-3 d-grid gap-2">
+                  <a class="btn btn-block btn-gradient-primary btn-lg font-weight-medium auth-form-btn">SIGN IN</a>
+                </div>
+                <div class="my-2 d-flex justify-content-between align-items-center">
+                  <div class="form-check">
+                    <label class="form-check-label text-muted">
+                      <input type="checkbox" class="form-check-input"> Keep me signed in </label>
+                  </div>
+                  <a class="auth-link text-primary">Forgot password?</a>
+                </div>
+            </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+  <script src="{% static 'assets/vendors/js/vendor.bundle.base.js' %}"></script>
+  <script src="{% static 'assets/js/off-canvas.js' %}"></script>
+  <script src="{% static 'assets/js/misc.js' %}"></script>
+  <script src="{% static 'assets/js/settings.js' %}"></script>
+  <script src="{% static 'assets/js/todolist.js' %}"></script>
+  <script src="{% static 'assets/js/jquery.cookie.js' %}"></script>
+  
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+    const loginBtn = document.querySelector(".auth-form-btn");
+    const emailInput = document.getElementById("exampleInputEmail1");
+    const passwordInput = document.getElementById("exampleInputPassword1");
+
+    /* ----------------------------------------------------
+    UI Message Helper (Reusable Across All Pages)
+    ---------------------------------------------------- */
+    function showMessage(message, type = "error") {
+    let msgBox = document.getElementById("ui-message");
+
+    if (!msgBox) {
+    msgBox = document.createElement("div");
+    msgBox.id = "ui-message";
+    msgBox.style.marginTop = "15px";
+    msgBox.style.padding = "12px";
+    msgBox.style.borderRadius = "6px";
+    msgBox.style.fontSize = "14px";
+    msgBox.style.textAlign = "center";
+    document.querySelector(".auth-form-light").appendChild(msgBox);
+    }
+
+    msgBox.style.display = "block";
+    msgBox.style.color = type === "success" ? "#065f46" : "#991b1b";
+    msgBox.style.backgroundColor = type === "success" ? "#d1fae5" : "#fee2e2";
+    msgBox.style.border = type === "success"
+    ? "1px solid #10b981"
+    : "1px solid #ef4444";
+
+    msgBox.innerText = message;
+    }
+
+    function setLoading(isLoading) {
+    loginBtn.innerText = isLoading ? "Signing in..." : "SIGN IN";
+    loginBtn.style.pointerEvents = isLoading ? "none" : "auto";
+    loginBtn.style.opacity = isLoading ? "0.7" : "1";
+    }
+
+    /* ----------------------------------------------------
+    Login Handler
+    ---------------------------------------------------- */
+    loginBtn.addEventListener("click", function (e) {
+    e.preventDefault();
+
+    const identifier = emailInput.value.trim();
+    const password = passwordInput.value.trim();
+
+    if (!identifier || !password) {
+    showMessage("Please enter username / email / mobile and password.");
+    return;
+    }
+
+    // Dynamic payload detection
+    let payload = { password };
+
+    if (/^\d+$/.test(identifier)) {
+    payload.mobile_number = identifier;
+    } else if (identifier.includes("@")) {
+    payload.email = identifier;
+    } else {
+    payload.username = identifier;
+    }
+
+    setLoading(true);
+    showMessage("Authenticating, please wait...", "success");
+
+    fetch("/apis/login", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(payload)
+    })
+    .then(res => res.json())
+    .then(data => {
+
+    if (!data.status) {
+      showMessage(data.message || "Invalid credentials.");
+      setLoading(false);
+      return;
+    }
+
+    // Save tokens
+    localStorage.setItem("access_token", data.access_token);
+    localStorage.setItem("refresh_token", data.refresh_token);
+    localStorage.setItem("is_logged_in", "true");
+
+    showMessage("Login successful. Redirecting...", "success");
+
+    // Optional redirect
+    setTimeout(() => {
+      window.location.href = "/dashboard";
+    }, 1200);
+
+    })
+    .catch(() => {
+    showMessage("Server error. Please try again later.");
+    setLoading(false);
+    });
+    });
+
+    });
+  </script>
+
+
+</body>
+
+</html>
