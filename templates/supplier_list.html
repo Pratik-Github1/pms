@@ -1,13 +1,15 @@
 {% extends "base.html" %}
-{% block title %}Category List | Panda Medicine{% endblock %}
-
+{% block title %}Supplier List | Panda Medicine{% endblock %}
 {% block content %}
 <div class="page-header d-flex justify-content-between align-items-center">
-    <h3 class="page-title mb-0">Category Details</h3>
+    <h3 class="page-title mb-0">Supplier Details</h3>
 
-    <button class="btn btn-gradient-primary btn-sm" id="addCategoryBtn">
-        <i class="mdi mdi-plus"></i> Add Category
+    <button
+        class="btn btn-gradient-primary btn-sm"
+        onclick="window.location.href='/addSupplier/'">
+        <i class="mdi mdi-plus"></i> Add New Supplier
     </button>
+
 </div>
 
 <div class="row mt-3">
@@ -31,15 +33,16 @@
                         <thead class="table-light">
                             <tr>
                                 <th style="width: 60px;">#</th>
-                                <th>Name</th>
-                                <th>Description</th>
-                                <th style="width: 180px;">Created At</th>
+                                <th>Company Name</th>
+                                <th>Contact</th>
+                                <th>GST</th>
+                                <th style="width: 80px;">Action</th>
                             </tr>
                         </thead>
-                        <tbody id="categoryTableBody">
+                        <tbody id="medicineTableBody">
                             <tr>
                                 <td colspan="4" class="text-center text-muted">
-                                    Loading categories...
+                                    Loading medicines...
                                 </td>
                             </tr>
                         </tbody>
@@ -60,7 +63,7 @@
 <script>
     document.addEventListener("DOMContentLoaded", function () {
 
-        const tableBody = document.getElementById("categoryTableBody");
+        const tableBody = document.getElementById("medicineTableBody");
         const pagination = document.getElementById("pagination");
         const paginationInfo = document.getElementById("paginationInfo");
         const searchInput = document.getElementById("searchInput");
@@ -78,7 +81,7 @@
                 </tr>
             `;
 
-            const url = `/apis/categoryList?page=${page}&page_size=${pageSize}&search=${encodeURIComponent(currentSearch)}`;
+            const url = `/apis/supplierList?page=${page}&page_size=${pageSize}&search=${encodeURIComponent(currentSearch)}`;
 
             fetch(url)
                 .then(res => res.json())
@@ -103,15 +106,14 @@
         }
 
         /* -------------------- Render Table -------------------- */
-
         function renderTable(data, page) {
             tableBody.innerHTML = "";
 
             if (!data.length) {
                 tableBody.innerHTML = `
                     <tr>
-                        <td colspan="4" class="text-center text-muted">
-                            No categories found
+                        <td colspan="8" class="text-center text-muted">
+                            No medicines found
                         </td>
                     </tr>
                 `;
@@ -119,14 +121,35 @@
             }
 
             data.forEach((item, index) => {
-                tableBody.innerHTML += `
-                    <tr>
-                        <td>${(page - 1) * pageSize + index + 1}</td>
-                        <td>${item.name}</td>
-                        <td>${item.description || "-"}</td>
-                        <td>${new Date(item.created_at).toLocaleDateString()}</td>
-                    </tr>
-                `;
+
+            tableBody.innerHTML += `
+                <tr>
+                    <td>${(page - 1) * pageSize + index + 1}</td>
+                    <td>${item.company_name}</td>
+                    <td>
+                        <div>${item.phone}</div> </br>
+                        <div>${item.email || "-"}</div>
+                    </td>
+                    <td>${item.gst_number}</td>
+                    <td class="text-center">
+                        <button
+                            class="btn btn-sm btn-outline-primary view-btn"
+                            data-id="${item.id}"
+                            title="View Supplier"
+                        >
+                            <i class="mdi mdi-eye"></i>
+                        </button>
+                    </td>
+                </tr>
+            `;
+        });
+
+
+            document.querySelectorAll(".view-btn").forEach(btn => {
+                btn.addEventListener("click", function () {
+                    const medicineId = this.getAttribute("data-id");
+                    window.location.href = `/addSupplier/?id=${medicineId}`;
+                });
             });
         }
 
@@ -200,4 +223,5 @@
 
     });
 </script>
+
 {% endblock %}

@@ -39,7 +39,7 @@
         <nav class="sidebar sidebar-offcanvas" id="sidebar">
           <ul class="nav">
             <li class="nav-item nav-profile">
-              <a href="#" class="nav-link">
+              <a href="/" class="nav-link">
                 <div class="nav-profile-image">
                   <img src="{% static 'assets/images/faces/face1.jpg' %}" alt="profile" />
                   <span class="login-status online"></span>
@@ -52,7 +52,7 @@
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/dashboard/">
+              <a class="nav-link" href="/">
                 <span class="menu-title">Dashboard</span>
               </a>
             </li>
@@ -71,36 +71,71 @@
             </li>
 
             <li class="nav-item">
-              <a class="nav-link" data-bs-toggle="collapse" href="#store-users" aria-expanded="false" aria-controls="store-users">
-                <span class="menu-title">Users</span>
+              <a class="nav-link" data-bs-toggle="collapse" href="#medicines-details" aria-expanded="false" aria-controls="medicines-details">
+                <span class="menu-title">Medicines</span>
                 <i class="menu-arrow"></i>
               </a>
-              <div class="collapse" id="store-users">
+              <div class="collapse" id="medicines-details">
                 <ul class="nav flex-column sub-menu">
                   <li class="nav-item">
-                    <a class="nav-link" href="#">Add New User</a>
+                    <a class="nav-link" href="/addMedicine/">Add Medicine</a>
                   </li>
                   <li class="nav-item">
-                    <a class="nav-link" href="#">User List</a>
+                    <a class="nav-link" href="/medicineList/">Medicines List</a>
                   </li>
                 </ul>
               </div>
             </li>
+
             <li class="nav-item">
-              <a class="nav-link" data-bs-toggle="collapse" href="#medicine-info" aria-expanded="false" aria-controls="medicine-info">
-                <span class="menu-title">Medicines</span>
+              <a class="nav-link" data-bs-toggle="collapse" href="#Purchase-info" aria-expanded="false" aria-controls="Purchase-info">
+                <span class="menu-title">Purchases</span>
                 <i class="menu-arrow"></i>
               </a>
-              <div class="collapse" id="medicine-info">
+              <div class="collapse" id="Purchase-info">
                 <ul class="nav flex-column sub-menu">
                   <li class="nav-item">
-                    <a class="nav-link" href="/categoryList/">Categories</a>
+                    <a class="nav-link" href="/supplierList/">Suppliers</a>
                   </li>
                   <li class="nav-item">
-                    <a class="nav-link" href="#">Manufacturers</a>
+                    <a class="nav-link" href="#">Create Purchase Note</a>
                   </li>
                   <li class="nav-item">
-                    <a class="nav-link" href="#">Rack Locations</a>
+                    <a class="nav-link" href="#">Purchase List</a>
+                  </li>
+                </ul>
+              </div>
+            </li>
+
+            <li class="nav-item">
+              <a class="nav-link" data-bs-toggle="collapse" href="#sales-info" aria-expanded="false" aria-controls="sales-info">
+                <span class="menu-title">Sales</span>
+                <i class="menu-arrow"></i>
+              </a>
+              <div class="collapse" id="sales-info">
+                <ul class="nav flex-column sub-menu">
+                  <li class="nav-item">
+                    <a class="nav-link" href="#">Create Sales Note</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="#">Sale List</a>
+                  </li>
+                </ul>
+              </div>
+            </li>
+
+            <li class="nav-item">
+              <a class="nav-link" data-bs-toggle="collapse" href="#expiry-info" aria-expanded="false" aria-controls="expiry-info">
+                <span class="menu-title">Expires</span>
+                <i class="menu-arrow"></i>
+              </a>
+              <div class="collapse" id="expiry-info">
+                <ul class="nav flex-column sub-menu">
+                  <li class="nav-item">
+                    <a class="nav-link" href="#">Create Expiry Note</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="#">Expiry Note Lits</a>
                   </li>
                 </ul>
               </div>

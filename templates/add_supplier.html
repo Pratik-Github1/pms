@@ -1,0 +1,260 @@
+{% extends "base.html" %}
+{% block title %}Add Supplier | Panda Medicine{% endblock %}
+{% block content %}
+
+<div class="page-header">
+    <h3 class="page-title">
+        Enter Supplier Details
+    </h3>
+</div>
+
+<div class="row">
+    <div class="col-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <div id="formAlert" class="alert d-none" role="alert"></div>
+
+                    <button type="button"
+                            id="editBtn"
+                            class="btn btn-sm btn-outline-primary d-none ms-auto"
+                            title="Edit Supplier Details">
+                        <i class="mdi mdi-pencil"></i> Edit
+                    </button>
+                </div>
+
+                <form class="forms-sample" id="addSupplierForm">
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label>Supplier Name <span class="text-danger">*</span></label>
+                                <input type="text"
+                                       class="form-control"
+                                       id="name"
+                                       placeholder="Supplier Name"
+                                       required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Company Name</label>
+                                <input type="text"
+                                       class="form-control"
+                                       id="company_name"
+                                       placeholder="Company Name">
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>GST Number</label>
+                                <input type="text"
+                                       class="form-control"
+                                       id="gst_number"
+                                       placeholder="GST Number">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Phone</label>
+                                <input type="text"
+                                       class="form-control"
+                                       id="phone"
+                                       placeholder="Phone Number">
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Email</label>
+                                <input type="email"
+                                       class="form-control"
+                                       id="email"
+                                       placeholder="Email Address">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label>Address</label>
+                                <textarea class="form-control"
+                                          id="address"
+                                          rows="3"
+                                          placeholder="Supplier Address"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="reset"
+                            class="btn btn-gradient-danger me-2"
+                            id="cancelBtn">
+                        Cancel
+                    </button>
+
+                    <button type="submit"
+                            class="btn btn-gradient-primary me-2"
+                            id="submitBtn">
+                        Submit
+                    </button>
+
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const API_URL = "/apis/suppliers";
+
+    const form = document.getElementById("addSupplierForm");
+    const alertBox = document.getElementById("formAlert");
+    const editBtn = document.getElementById("editBtn");
+    const submitBtn = document.getElementById("submitBtn");
+
+    let supplierId = null;
+    let isEditMode = false;
+
+    /* -------------------------
+       Utilities
+    ------------------------- */
+
+    function showMessage(message, type = "success") {
+        alertBox.className = `alert alert-${type}`;
+        alertBox.textContent = message;
+        alertBox.classList.remove("d-none");
+    }
+
+    function hideMessage() {
+        alertBox.classList.add("d-none");
+    }
+
+    function setFormDisabled(disabled = true) {
+        [...form.elements].forEach(el => {
+            if (el.tagName !== "BUTTON") {
+                el.disabled = disabled;
+            }
+        });
+    }
+
+    function getQueryParam(param) {
+        return new URLSearchParams(window.location.search).get(param);
+    }
+
+    function getFormData() {
+        return {
+            name: document.getElementById("name").value.trim(),
+            company_name: document.getElementById("company_name").value.trim(),
+            phone: document.getElementById("phone").value.trim(),
+            email: document.getElementById("email").value.trim(),
+            address: document.getElementById("address").value.trim(),
+            gst_number: document.getElementById("gst_number").value.trim()
+        };
+    }
+
+    function populateForm(data) {
+        Object.keys(data).forEach(key => {
+            const field = document.getElementById(key);
+            if (field) {
+                field.value = data[key] ?? "";
+            }
+        });
+    }
+
+    /* -------------------------
+       Initial Load (VIEW MODE)
+    ------------------------- */
+
+    supplierId = getQueryParam("id");
+
+    if (supplierId) {
+        fetch(`${API_URL}?id=${supplierId}`)
+            .then(res => res.json())
+            .then(response => {
+                if (!response.status) {
+                    showMessage(response.message, "danger");
+                    return;
+                }
+
+                populateForm(response.data);
+                setFormDisabled(true);
+                submitBtn.classList.add("d-none");
+                editBtn.classList.remove("d-none");
+            })
+            .catch(() => {
+                showMessage("Failed to fetch supplier details.", "danger");
+            });
+    }
+
+    /* -------------------------
+       Edit Button
+    ------------------------- */
+
+    editBtn.addEventListener("click", function () {
+        isEditMode = true;
+        setFormDisabled(false);
+        submitBtn.classList.remove("d-none");
+        editBtn.classList.add("d-none");
+        hideMessage();
+    });
+
+    /* -------------------------
+       Submit (CREATE / UPDATE)
+    ------------------------- */
+
+    form.addEventListener("submit", function (e) {
+        e.preventDefault();
+        hideMessage();
+
+        const payload = getFormData();
+        let method = "POST";
+
+        if (supplierId && isEditMode) {
+            payload.id = supplierId;
+            method = "PATCH";
+        }
+
+        fetch(API_URL, {
+            method: method,
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        })
+        .then(res => res.json())
+        .then(response => {
+            if (!response.status) {
+                showMessage(response.message, "danger");
+                return;
+            }
+
+            showMessage(response.message, "success");
+
+            if (method === "PATCH") {
+                setFormDisabled(true);
+                submitBtn.classList.add("d-none");
+                editBtn.classList.remove("d-none");
+                isEditMode = false;
+            } else {
+                form.reset();
+            }
+        })
+        .catch(() => {
+            showMessage("Server error. Please try again.", "danger");
+        });
+    });
+
+});
+</script>
+
+{% endblock %}

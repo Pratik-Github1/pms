@@ -1,12 +1,14 @@
-from django.http import JsonResponse
-from rest_framework.views import APIView
+from django.db.models import Q
+from apps.models import Supplier
 from rest_framework import status
+from django.http import JsonResponse
+from rest_framework import serializers
+from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny
 from django.db import transaction, IntegrityError
+from rest_framework.pagination import PageNumberPagination
 
-from apps.models import Supplier
 import logging
-
 logger = logging.getLogger(__name__)
 
 
@@ -195,3 +197,54 @@ class SupplierCRUDView(APIView):
             response_data["message"] = "An error occurred while deleting supplier."
             response_data["error"] = str(e)
             return JsonResponse(response_data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class SupplierListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Supplier
+        fields = [
+            "id",
+            "name",
+            "company_name",
+            "phone",
+            "email",
+            "address",
+            "gst_number",
+            "is_active",
+            "created_at",
+        ]
+
+class StandardResultsPagination(PageNumberPagination):
+    page_size = 10
+    page_size_query_param = "page_size"
+    max_page_size = 100
+
+class SupplierListView(APIView):
+    """
+    List Suppliers with Pagination & Search
+    """
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        search = request.GET.get("search", "").strip()
+
+        queryset = Supplier.objects.all().order_by("-id")
+
+        if search:
+            queryset = queryset.filter(
+                Q(name__icontains=search) |
+                Q(company_name__icontains=search) |
+                Q(phone__icontains=search) |
+                Q(email__icontains=search) |
+                Q(gst_number__icontains=search)
+            )
+
+        paginator = StandardResultsPagination()
+        paginated_qs = paginator.paginate_queryset(queryset, request)
+
+        serializer = SupplierListSerializer(paginated_qs, many=True)
+
+        return paginator.get_paginated_response({
+            "status": True,
+            "message": "Supplier list fetched successfully.",
+            "data": serializer.data
+        })

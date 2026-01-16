@@ -3,7 +3,8 @@ from django.conf import settings
 from core.authentication.auth import *
 from django.conf.urls.static import static
 from core.apis.StoreInformations import *
-from core.apis.Category import *
+from core.apis.Medicine import *
+from core.apis.Supplier import *
 
 app_name = "core"
 
@@ -16,8 +17,11 @@ urlpatterns = [
     path('getStoreInformation', GETStoreProfileInformation.as_view(), name='getStoreInformation'),
     path('storeInformation', StoreProfileCRUDView.as_view(), name='storeInformation'),
 
-    path('categoryInformation', CategoryCRUDView.as_view(), name='categoryInformation'),
-    path('categoryList', CategoryListView.as_view(), name='categoryList'),
+    path('medicines', MedicineCRUDView.as_view(), name='medicines'),
+    path('medicineList', MedicineInventoryListView.as_view(), name='medicineList'),
+
+    path('supplierList', SupplierListView.as_view(), name='supplierList'),
+    path('suppliers', SupplierCRUDView.as_view(), name='suppliers'),
 ]
 
 if settings.DEBUG:

@@ -19,8 +19,14 @@ def DashboardPage(request):
 def StoreProfilePage(request):
     return render(request, "store_profile.html")
 
-def CategoryListPage(request):
-    return render(request, "medicines/category/category_list.html")
+def addMedicinePage(request):
+    return render(request, "add_medicine.html")
 
-def AddCategoryPage(request):
-    return render(request, "medicines/category/add_category.html")
+def medicineListPage(request):
+    return render(request, "medicine_list.html")
+
+def supplierListPage(request):
+    return render(request, "supplier_list.html")
+
+def addSupplierPage(request):
+    return render(request, "add_supplier.html")
