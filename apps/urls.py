@@ -16,5 +16,7 @@ urlpatterns = [
 
     path('addSupplier/', views.addSupplierPage, name='addSupplier'),
     path('supplierList/', views.supplierListPage, name='supplierList'),
+    path('purchaseNoteList/', views.purchaseNoteListPage, name='purchaseNoteList'),
+    path('createPurchaseNote/', views.createPurchaseNotePage, name='createPurchaseNote'),
     
 ]

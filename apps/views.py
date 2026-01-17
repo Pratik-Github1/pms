@@ -14,19 +14,25 @@ def LoginPage(request):
     return render(request, 'auth/login.html')
 
 def DashboardPage(request):
-    return render(request, "dash.html")
+    return render(request, "dashboard/dash.html")
 
 def StoreProfilePage(request):
-    return render(request, "store_profile.html")
+    return render(request, "store_profile/store_profile.html")
 
 def addMedicinePage(request):
-    return render(request, "add_medicine.html")
+    return render(request, "medicines/add_medicine.html")
 
 def medicineListPage(request):
-    return render(request, "medicine_list.html")
+    return render(request, "medicines/medicine_list.html")
 
 def supplierListPage(request):
-    return render(request, "supplier_list.html")
+    return render(request, "purchases/supplier_list.html")
 
 def addSupplierPage(request):
-    return render(request, "add_supplier.html")
+    return render(request, "purchases/add_supplier.html")
+
+def createPurchaseNotePage(request):
+    return render(request, "purchases/create_purchase_note.html")
+
+def purchaseNoteListPage(request):
+    return render(request, "purchases/purchase_note_list.html")
