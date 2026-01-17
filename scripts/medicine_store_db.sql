@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3307
--- Generation Time: Jan 16, 2026 at 04:42 PM
+-- Generation Time: Jan 17, 2026 at 04:59 AM
 -- Server version: 8.0.30
 -- PHP Version: 8.1.10
 
@@ -99,9 +99,9 @@ INSERT INTO `medicine_inventory` (`id`, `name`, `medicine_uses`, `hsn_code`, `un
 (9, 'Pantoprazole 40mg', 'Acid reflux and GERD', '30049099', 'strip', '10 tablets per strip', 20, 'PAN40-P5', '2023-10-15', '2025-10-14', 'RACK-D1', 22.00, 35.00, 90, 1, 0, '2026-01-16 20:38:11', '2026-01-16 20:38:11'),
 (10, 'Vitamin C Tablets', 'Immunity booster', '21069099', 'bottle', '60 tablets per bottle', 5, 'VITC-60-01', '2024-04-01', '2026-03-31', 'RACK-E1', 110.00, 180.00, 35, 1, 0, '2026-01-16 20:38:11', '2026-01-16 20:38:11'),
 (11, 'Cough Syrup', 'Relief from cough and cold', '30049099', 'bottle', '100 ml bottle', 10, 'CS-100-09', '2023-08-01', '2025-07-31', 'RACK-F2', 48.00, 75.00, 22, 1, 0, '2026-01-16 20:38:11', '2026-01-16 20:38:11'),
-(12, 'Ibuprofen 400mg', 'Pain and inflammation relief', '30045020', 'strip', '10 tablets per strip', 15, 'IBU400-I4', '2024-02-20', '2026-02-19', 'RACK-A2', 30.00, 45.00, 70, 1, 0, '2026-01-16 20:38:11', '2026-01-16 20:38:11'),
-(13, 'Insulin Injection', 'Diabetes management', '30043100', 'vial', '10 ml vial', 1, 'INS-10ML-77', '2024-06-01', '2025-05-31', 'COLD-RACK-1', 420.00, 550.00, 8, 1, 0, '2026-01-16 20:38:11', '2026-01-16 21:05:11'),
-(14, 'Metformin 500mg', 'Diabetes management', '30049099', 'strip', '10 tablets per strip', 20, 'MET500-OLD', '2022-01-01', '2024-01-01', 'RACK-D2', 10.00, 28.00, 0, 0, 1, '2026-01-16 20:38:11', '2026-01-16 20:41:36');
+(12, 'Ibuprofen 400mg', 'Pain and inflammation relief', '30045020', 'strip', '10 tablets per strip', 15, 'IBU400-I4', '2024-02-20', '2026-02-19', 'RACK-A2', 100.00, 200.00, 90, 1, 0, '2026-01-16 20:38:11', '2026-01-17 10:11:02'),
+(13, 'Insulin Injection', 'Diabetes management', '30043100', 'vial', '10 ml vial', 1, 'INS-10ML-77', '2024-06-01', '2025-05-31', 'COLD-RACK-1', 100.00, 200.00, 8, 1, 0, '2026-01-16 20:38:11', '2026-01-17 10:11:02'),
+(14, 'Metformin 500mg', 'Diabetes management', '30049099', 'strip', '10 tablets per strip', 20, 'MET500-OLD', '2022-01-01', '2024-01-01', 'RACK-D2', 14.00, 28.00, 15, 0, 1, '2026-01-16 20:38:11', '2026-01-17 09:49:00');
 
 -- --------------------------------------------------------
 
@@ -122,6 +122,15 @@ CREATE TABLE `purchase_invoices` (
   `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
+--
+-- Dumping data for table `purchase_invoices`
+--
+
+INSERT INTO `purchase_invoices` (`id`, `supplier_id`, `invoice_number`, `invoice_date`, `payment_mode`, `total_amount`, `amount_paid`, `remarks`, `created_at`, `updated_at`) VALUES
+(1, 13, 'SUP-13-INV-001-UPDATED', '2026-01-20', 'Cash', 70.00, 70.00, 'Quantity corrected after verification', '2026-01-17 09:45:13', '2026-01-17 09:49:00'),
+(2, 13, 'SUP-13-INV-001', '2026-01-20', 'Cash', 140.00, 140.00, 'Initial stock purchase for Metformin', '2026-01-17 09:45:50', '2026-01-17 09:45:50'),
+(3, 13, 'INVOICE 123', '2026-01-17', 'Cash', 3500.00, 300.00, 'gOOD', '2026-01-17 10:09:52', '2026-01-17 10:11:02');
+
 -- --------------------------------------------------------
 
 --
@@ -138,6 +147,16 @@ CREATE TABLE `purchase_invoice_items` (
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `purchase_invoice_items`
+--
+
+INSERT INTO `purchase_invoice_items` (`id`, `purchase_invoice_id`, `medicine_id`, `quantity`, `purchase_price`, `mrp`, `created_at`, `updated_at`) VALUES
+(2, 2, 14, 10, 14.00, 28.00, '2026-01-17 09:45:50', '2026-01-17 09:45:50'),
+(3, 1, 14, 5, 14.00, 28.00, '2026-01-17 09:49:00', '2026-01-17 09:49:00'),
+(6, 3, 12, 15, 200.00, 300.00, '2026-01-17 10:11:02', '2026-01-17 10:11:02'),
+(7, 3, 12, 5, 100.00, 200.00, '2026-01-17 10:11:02', '2026-01-17 10:11:02');
 
 -- --------------------------------------------------------
 
@@ -397,13 +416,13 @@ ALTER TABLE `medicine_inventory`
 -- AUTO_INCREMENT for table `purchase_invoices`
 --
 ALTER TABLE `purchase_invoices`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `purchase_invoice_items`
 --
 ALTER TABLE `purchase_invoice_items`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `sales_invoices`
