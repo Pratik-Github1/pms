@@ -18,5 +18,8 @@ urlpatterns = [
     path('supplierList/', views.supplierListPage, name='supplierList'),
     path('purchaseNoteList/', views.purchaseNoteListPage, name='purchaseNoteList'),
     path('createPurchaseNote/', views.createPurchaseNotePage, name='createPurchaseNote'),
+
+    path('createSalesNote/', views.createSalesInvoicePage, name='createSalesInvoice'),
+    path("salesInvoiceList/", views.sales_invoice_list_page),
     
 ]

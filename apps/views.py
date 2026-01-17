@@ -36,3 +36,9 @@ def createPurchaseNotePage(request):
 
 def purchaseNoteListPage(request):
     return render(request, "purchases/purchase_note_list.html")
+
+def createSalesInvoicePage(request):
+    return render(request, "sales/create_sales_note.html")
+
+def sales_invoice_list_page(request):
+    return render(request, "sales/sales_note_list.html")
