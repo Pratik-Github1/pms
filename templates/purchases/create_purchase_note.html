@@ -1,0 +1,328 @@
+{% extends "base.html" %}
+{% block title %}Create Purchase Note | Panda Medicine{% endblock %}
+{% block content %}
+<style>
+    #itemsBody select,
+    #itemsBody input {
+        font-size: 13px;
+    }
+</style>
+
+<div class="page-header">
+    <h3 class="page-title">Create Purchase Note</h3>
+</div>
+
+<div class="row">
+    <div class="col-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <div id="formAlert" class="alert d-none" role="alert"></div>
+
+                    <button type="button"
+                            id="editBtn"
+                            class="btn btn-sm btn-outline-primary d-none ms-auto">
+                        <i class="mdi mdi-pencil"></i> Edit
+                    </button>
+                </div>
+
+                <form id="purchaseForm">
+
+                    <!-- Invoice Header -->
+                    <div class="row">
+                        <div class="col-md-4">
+                            <label>Supplier</label>
+                            <select class="form-control" id="supplier_id">
+                                <option value="13">Supplier #13</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label>Invoice Number</label>
+                            <input type="text" class="form-control" id="invoice_number" required>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label>Invoice Date</label>
+                            <input type="date" class="form-control" id="invoice_date" required>
+                        </div>
+                    </div>
+
+                    <div class="row mt-3">
+                        <div class="col-md-4">
+                            <label>Payment Mode</label>
+                            <select class="form-control" id="payment_mode">
+                                <option value="Cash">Cash</option>
+                                <option value="Online">Online</option>
+                                <option value="Credit">Credit</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label>Amount Paid</label>
+                            <input type="number" step="0.01" class="form-control" id="amount_paid">
+                        </div>
+
+                        <div class="col-md-4">
+                            <label>Remarks</label>
+                            <input type="text" class="form-control" id="remarks">
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <!-- Items -->
+                    <h5>Purchase Items</h5>
+
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Medicine</th>
+                                <th>Qty</th>
+                                <th>Purchase Price</th>
+                                <th>MRP</th>
+                                <th style="width: 50px;"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="itemsBody"></tbody>
+                    </table>
+
+                    <button type="button" class="btn btn-sm btn-outline-secondary" id="addItemBtn">
+                        + Add Item
+                    </button>
+
+                    <hr>
+
+                    <button type="submit" class="btn btn-gradient-primary" id="submitBtn">
+                        Submit
+                    </button>
+
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const API_URL = "/apis/purchaseInvoices";
+
+    const form = document.getElementById("purchaseForm");
+    const alertBox = document.getElementById("formAlert");
+    const editBtn = document.getElementById("editBtn");
+    const submitBtn = document.getElementById("submitBtn");
+    const itemsBody = document.getElementById("itemsBody");
+    const addItemBtn = document.getElementById("addItemBtn");
+
+    let invoiceId = new URLSearchParams(window.location.search).get("id");
+    let isEditMode = false;
+
+    let SUPPLIERS = [];
+    let MEDICINES = [];
+
+
+    function showMessage(msg, type="success") {
+        alertBox.className = `alert alert-${type}`;
+        alertBox.textContent = msg;
+        alertBox.classList.remove("d-none");
+    }
+
+    function hideMessage() {
+        alertBox.classList.add("d-none");
+    }
+
+    function setDisabled(disabled) {
+        [...form.elements].forEach(el => {
+            if (el.tagName !== "BUTTON") el.disabled = disabled;
+        });
+    }
+
+    function addItemRow(data = {}) {
+
+        let medicineOptions = `<option value="">Select Medicine</option>`;
+
+        MEDICINES.forEach(med => {
+            const selected = data.medicine_id == med.id ? "selected" : "";
+            medicineOptions += `
+                <option value="${med.id}" ${selected}>
+                    ${med.name}
+                </option>
+            `;
+        });
+
+        itemsBody.insertAdjacentHTML("beforeend", `
+            <tr>
+                <td style="min-width:180px">
+                    <select class="form-control medicine_id">
+                        ${medicineOptions}
+                    </select>
+                </td>
+
+                <td style="width:90px">
+                    <input type="number"
+                        class="form-control quantity"
+                        value="${data.quantity || ""}">
+                </td>
+
+                <td style="width:110px">
+                    <input type="number"
+                        step="0.01"
+                        class="form-control purchase_price"
+                        value="${data.purchase_price || ""}">
+                </td>
+
+                <td style="width:110px">
+                    <input type="number"
+                        step="0.01"
+                        class="form-control mrp"
+                        value="${data.mrp || ""}">
+                </td>
+
+                <td style="width:40px" class="text-center">
+                    <button type="button"
+                            class="btn btn-sm btn-danger removeBtn">×</button>
+                </td>
+            </tr>
+        `);
+    }
+
+    function loadSuppliers() {
+        fetch("/apis/getSuppliers")
+            .then(res => res.json())
+            .then(res => {
+                if (!res.status) return;
+                SUPPLIERS = res.data;
+
+                const supplierSelect = document.getElementById("supplier_id");
+                supplierSelect.innerHTML = `<option value="">Select Supplier</option>`;
+
+                SUPPLIERS.forEach(s => {
+                    supplierSelect.innerHTML += `
+                        <option value="${s.id}">
+                            ${s.company_name || "Supplier #" + s.id}
+                        </option>
+                    `;
+                });
+            });
+    }
+
+    function loadMedicines(callback = null) {
+        fetch("/apis/getMedicines")
+            .then(res => res.json())
+            .then(res => {
+                if (!res.status) return;
+                MEDICINES = res.data;
+
+                // ✅ now medicines exist
+                if (callback) callback();
+            });
+    }
+
+
+    loadSuppliers();
+    loadMedicines();
+
+
+
+    addItemBtn.onclick = () => addItemRow();
+
+    itemsBody.addEventListener("click", e => {
+        if (e.target.classList.contains("removeBtn")) {
+            e.target.closest("tr").remove();
+        }
+    });
+
+    function collectItems() {
+        return [...itemsBody.querySelectorAll("tr")].map(row => ({
+            medicine_id: row.querySelector(".medicine_id").value,
+            quantity: row.querySelector(".quantity").value,
+            purchase_price: row.querySelector(".purchase_price").value,
+            mrp: row.querySelector(".mrp").value
+        }));
+    }
+
+    if (invoiceId) {
+        fetch(`${API_URL}?id=${invoiceId}`)
+            .then(r => r.json())
+            .then(res => {
+                if (!res.status) return showMessage(res.message, "danger");
+
+                const inv = res.data.invoice;
+                document.getElementById("supplier_id").value = inv.supplier_id;
+                document.getElementById("invoice_number").value = inv.invoice_number;
+                document.getElementById("invoice_date").value = inv.invoice_date;
+                document.getElementById("payment_mode").value = inv.payment_mode;
+                document.getElementById("amount_paid").value = inv.amount_paid;
+                document.getElementById("remarks").value = inv.remarks;
+
+                loadMedicines(() => {
+                    res.data.items.forEach(addItemRow);
+                });
+
+
+                setDisabled(true);
+                submitBtn.classList.add("d-none");
+                editBtn.classList.remove("d-none");
+            });
+    } else {
+        loadMedicines(() => {
+            addItemRow();
+        });
+    }
+
+
+    editBtn.onclick = () => {
+        isEditMode = true;
+        setDisabled(false);
+        submitBtn.classList.remove("d-none");
+        editBtn.classList.add("d-none");
+    };
+
+    form.onsubmit = e => {
+        e.preventDefault();
+        hideMessage();
+
+        const payload = {
+            supplier_id: document.getElementById("supplier_id").value,
+            invoice_number: document.getElementById("invoice_number").value,
+            invoice_date: document.getElementById("invoice_date").value,
+            payment_mode: document.getElementById("payment_mode").value,
+            amount_paid: document.getElementById("amount_paid").value,
+            remarks: document.getElementById("remarks").value,
+            items: collectItems()
+        };
+
+        let method = "POST";
+        if (invoiceId && isEditMode) {
+            payload.id = invoiceId;
+            method = "PATCH";
+        }
+
+        fetch(API_URL, {
+            method,
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        })
+        .then(r => r.json())
+        .then(res => {
+            if (!res.status) return showMessage(res.message, "danger");
+            showMessage(res.message);
+            if (method === "PATCH") {
+                setDisabled(true);
+                submitBtn.classList.add("d-none");
+                editBtn.classList.remove("d-none");
+            } else {
+                form.reset();
+                itemsBody.innerHTML = "";
+                addItemRow();
+            }
+        });
+    };
+
+});
+</script>
+
+{% endblock %}

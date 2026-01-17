@@ -1,0 +1,232 @@
+{% extends "base.html" %}
+{% block title %}Purchase List | Panda Medicine{% endblock %}
+{% block content %}
+<div class="page-header d-flex justify-content-between align-items-center">
+    <h3 class="page-title mb-0">Purchase Details</h3>
+
+    <button
+        class="btn btn-gradient-primary btn-sm"
+        onclick="window.location.href='/createPurchaseNote/'">
+        <i class="mdi mdi-plus"></i> Add New Purchase Note
+    </button>
+
+</div>
+
+<div class="row mt-3">
+    <div class="col-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+
+                <!-- Search -->
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <input type="text"
+                               id="searchInput"
+                               class="form-control"
+                               placeholder="Search category...">
+                    </div>
+                </div>
+
+                <!-- Table -->
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th style="width: 60px;">#</th>
+                                <th>Company Name</th>
+                                <th>Invoice Details</th>
+                                <th>Amount</th>
+                                <th>Total Items</th>
+                                <th style="width: 80px;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="purchaseInvoiceTableBody">
+                            <tr>
+                                <td colspan="4" class="text-center text-muted">
+                                    Loading medicines...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                <div class="d-flex justify-content-between align-items-center mt-3">
+                    <div id="paginationInfo" class="text-muted"></div>
+                    <ul class="pagination pagination-sm mb-0" id="pagination"></ul>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const tableBody = document.getElementById("purchaseInvoiceTableBody");
+        const pagination = document.getElementById("pagination");
+        const paginationInfo = document.getElementById("paginationInfo");
+        const searchInput = document.getElementById("searchInput");
+
+        let currentPage = 1;
+        let pageSize = 10;
+        let currentSearch = "";
+
+        /* -------------------- Fetch Categories -------------------- */
+
+        function fetchCategories(page = 1) {
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="4" class="text-center text-muted">Loading...</td>
+                </tr>
+            `;
+
+            const url = `/apis/purchaseInvoicesList?page=${page}&page_size=${pageSize}&search=${encodeURIComponent(currentSearch)}`;
+
+            fetch(url)
+                .then(res => res.json())
+                .then(response => {
+                    const results = response.results;
+                    const data = results.data || [];
+                    const totalCount = response.count;
+
+                    renderTable(data, page);
+                    renderPagination(response, page);
+                    renderInfo(page, totalCount);
+                })
+                .catch(() => {
+                    tableBody.innerHTML = `
+                        <tr>
+                            <td colspan="4" class="text-center text-danger">
+                                Failed to load categories
+                            </td>
+                        </tr>
+                    `;
+                });
+        }
+
+        /* -------------------- Render Table -------------------- */
+        function renderTable(data, page) {
+            tableBody.innerHTML = "";
+
+            if (!data.length) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="8" class="text-center text-muted">
+                            No Purchase invoices found
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            data.forEach((item, index) => {
+
+            tableBody.innerHTML += `
+                <tr>
+                    <td>${(page - 1) * pageSize + index + 1}</td>
+                    <td>${item.supplier_company_name}</td>
+                    <td>
+                        <div>${item.invoice_number}</div> </br>
+                        <div>${item.invoice_date || "-"}</div>
+                    </td>
+                    <td>
+                        <div>${item.total_amount}</div> </br>
+                        <div>${item.payment_mode || "-"}</div>
+                    </td>
+                    <td>${item.total_items}</td>
+                    <td class="text-center">
+                        <button
+                            class="btn btn-sm btn-outline-primary view-btn"
+                            data-id="${item.id}"
+                            title="View Supplier"
+                        >
+                            <i class="mdi mdi-eye"></i>
+                        </button>
+                    </td>
+                </tr>
+            `;
+        });
+
+
+            document.querySelectorAll(".view-btn").forEach(btn => {
+                btn.addEventListener("click", function () {
+                    const medicineId = this.getAttribute("data-id");
+                    window.location.href = `/createPurchaseNote/?id=${medicineId}`;
+                });
+            });
+        }
+
+        /* -------------------- Pagination -------------------- */
+
+        function renderPagination(response, page) {
+            pagination.innerHTML = "";
+
+            const totalPages = Math.ceil(response.count / pageSize);
+
+            pagination.innerHTML += `
+                <li class="page-item ${page === 1 ? "disabled" : ""}">
+                    <a class="page-link" href="#">Previous</a>
+                </li>
+            `;
+
+            for (let i = 1; i <= totalPages; i++) {
+                pagination.innerHTML += `
+                    <li class="page-item ${i === page ? "active" : ""}">
+                        <a class="page-link" href="#">${i}</a>
+                    </li>
+                `;
+            }
+
+            pagination.innerHTML += `
+                <li class="page-item ${page === totalPages ? "disabled" : ""}">
+                    <a class="page-link" href="#">Next</a>
+                </li>
+            `;
+
+            Array.from(pagination.querySelectorAll(".page-link")).forEach((link, index) => {
+                link.addEventListener("click", function (e) {
+                    e.preventDefault();
+
+                    if (this.textContent === "Previous" && page > 1) {
+                        currentPage--;
+                    } else if (this.textContent === "Next" && page < totalPages) {
+                        currentPage++;
+                    } else if (!isNaN(this.textContent)) {
+                        currentPage = Number(this.textContent);
+                    }
+
+                    fetchCategories(currentPage);
+                });
+            });
+        }
+
+        /* -------------------- Pagination Info -------------------- */
+
+        function renderInfo(page, total) {
+            const start = (page - 1) * pageSize + 1;
+            const end = Math.min(page * pageSize, total);
+            paginationInfo.textContent = `Showing ${start}–${end} of ${total} categories`;
+        }
+
+        /* -------------------- Search -------------------- */
+
+        let searchTimer = null;
+        searchInput.addEventListener("keyup", function () {
+            clearTimeout(searchTimer);
+            searchTimer = setTimeout(() => {
+                currentSearch = this.value.trim();
+                currentPage = 1;
+                fetchCategories();
+            }, 400);
+        });
+
+        /* -------------------- Initial Load -------------------- */
+
+        fetchCategories();
+
+    });
+</script>
+
+{% endblock %}

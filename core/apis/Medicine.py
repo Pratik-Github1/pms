@@ -222,3 +222,18 @@ class MedicineInventoryListView(APIView):
             "message": "Medicine inventory list fetched successfully.",
             "data": serializer.data
         })
+
+class GetMedicineInventoryListSmall(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        suppliers = MedicineInventory.objects.values(
+            "id",
+            "name"
+        ).order_by("-id")
+
+        return JsonResponse({
+            "status": True,
+            "message": "Supplier list fetched successfully.",
+            "data": list(suppliers)
+        })

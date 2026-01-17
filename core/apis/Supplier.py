@@ -248,3 +248,18 @@ class SupplierListView(APIView):
             "message": "Supplier list fetched successfully.",
             "data": serializer.data
         })
+
+class GetSupplierListSmall(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        suppliers = Supplier.objects.values(
+            "id",
+            "company_name"
+        ).order_by("-id")
+
+        return JsonResponse({
+            "status": True,
+            "message": "Supplier list fetched successfully.",
+            "data": list(suppliers)
+        })

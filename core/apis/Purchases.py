@@ -1,8 +1,11 @@
 from rest_framework import status
 from django.db import transaction
 from django.http import JsonResponse
+from rest_framework import serializers
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny
+from rest_framework.pagination import PageNumberPagination
+from django.db.models import Q, Count, OuterRef, Subquery
 
 from apps.models import (
     Supplier,
@@ -324,3 +327,72 @@ class PurchaseInvoiceCRUDView(APIView):
             response_data["message"] = "Failed to update purchase invoice."
             response_data["error"] = str(e)
             return JsonResponse(response_data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class PurchaseInvoiceListSerializer(serializers.ModelSerializer):
+    supplier_company_name = serializers.CharField(read_only=True)
+    total_items = serializers.IntegerField(read_only=True)
+
+    class Meta:
+        model = PurchaseInvoice
+        fields = [
+            "id",
+            "supplier_id",
+            "supplier_company_name",
+            "invoice_number",
+            "invoice_date",
+            "payment_mode",
+            "total_amount",
+            "amount_paid",
+            "total_items",
+            "remarks",
+            "created_at",
+        ]
+
+
+class StandardResultsPagination(PageNumberPagination):
+    page_size = 10
+    page_size_query_param = "page_size"
+    max_page_size = 100
+
+class PurchaseInvoiceListView(APIView):
+    """
+    List Purchase Invoices with Pagination & Search
+    """
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        search = request.GET.get("search", "").strip()
+
+        supplier_company_subquery = Supplier.objects.filter(
+            id=OuterRef("supplier_id")
+        ).values("company_name")[:1]
+
+        queryset = (
+            PurchaseInvoice.objects
+            .annotate(
+                supplier_company_name=Subquery(supplier_company_subquery),
+                total_items=Count("id", filter=Q(
+                    id__in=PurchaseInvoiceItem.objects.values("purchase_invoice_id")
+                ))
+            )
+            .order_by("-id")
+        )
+
+        if search:
+            queryset = queryset.filter(
+                Q(invoice_number__icontains=search) |
+                Q(payment_mode__icontains=search) |
+                Q(remarks__icontains=search) |
+                Q(supplier_company_name__icontains=search)
+            )
+
+        paginator = StandardResultsPagination()
+        paginated_qs = paginator.paginate_queryset(queryset, request)
+
+        serializer = PurchaseInvoiceListSerializer(paginated_qs, many=True)
+
+        return paginator.get_paginated_response({
+            "status": True,
+            "message": "Purchase invoice list fetched successfully.",
+            "data": serializer.data
+        })

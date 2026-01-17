@@ -5,6 +5,7 @@ from django.conf.urls.static import static
 from core.apis.StoreInformations import *
 from core.apis.Medicine import *
 from core.apis.Supplier import *
+from core.apis.Purchases import *
 
 app_name = "core"
 
@@ -19,9 +20,14 @@ urlpatterns = [
 
     path('medicines', MedicineCRUDView.as_view(), name='medicines'),
     path('medicineList', MedicineInventoryListView.as_view(), name='medicineList'),
+    path('getMedicines', GetMedicineInventoryListSmall.as_view(), name='getMedicines'),
 
     path('supplierList', SupplierListView.as_view(), name='supplierList'),
+    path('getSuppliers', GetSupplierListSmall.as_view(), name='getSuppliers'),
     path('suppliers', SupplierCRUDView.as_view(), name='suppliers'),
+
+    path('purchaseInvoices', PurchaseInvoiceCRUDView.as_view(), name='purchaseInvoices'),
+    path('purchaseInvoicesList', PurchaseInvoiceListView.as_view(), name='purchaseInvoicesList'),
 ]
 
 if settings.DEBUG:
