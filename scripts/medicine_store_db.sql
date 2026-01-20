@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3307
--- Generation Time: Jan 17, 2026 at 04:59 AM
+-- Generation Time: Jan 20, 2026 at 04:54 AM
 -- Server version: 8.0.30
 -- PHP Version: 8.1.10
 
@@ -93,15 +93,15 @@ INSERT INTO `medicine_inventory` (`id`, `name`, `medicine_uses`, `hsn_code`, `un
 (3, 'Paracetamol 500mg', 'Pain relief and fever reduction', '30045010', 'strip', '10 tablets per strip', 20, 'PCM500-A1', '2024-01-15', '2026-01-14', 'RACK-A1', 18.50, 25.00, 120, 1, 0, '2026-01-16 20:38:11', '2026-01-16 20:38:11'),
 (4, 'Paracetamol 500mg', 'Pain relief and fever reduction', '30045010', 'strip', '10 tablets per strip', 20, 'PCM500-B2', '2023-12-10', '2025-12-09', 'RACK-A1', 18.00, 25.00, 60, 1, 0, '2026-01-16 20:38:11', '2026-01-16 20:38:11'),
 (5, 'Amoxicillin 250mg', 'Bacterial infection treatment', '30042019', 'strip', '10 capsules per strip', 10, 'AMX250-X9', '2024-02-01', '2026-01-31', 'RACK-B2', 55.00, 72.00, 40, 1, 0, '2026-01-16 20:38:11', '2026-01-16 20:38:11'),
-(6, 'Amoxicillin 500mg', 'Bacterial infection treatment', '30042019', 'strip', '10 capsules per strip', 10, 'AMX500-Y1', '2023-11-20', '2025-11-19', 'RACK-B2', 85.00, 110.00, 25, 1, 0, '2026-01-16 20:38:11', '2026-01-16 20:38:11'),
-(7, 'Cetirizine 10mg', 'Allergy relief', '30049099', 'strip', '10 tablets per strip', 15, 'CTZ10-C3', '2024-03-05', '2027-03-04', 'RACK-C1', 12.00, 20.00, 200, 1, 0, '2026-01-16 20:38:11', '2026-01-16 20:38:11'),
+(6, 'Amoxicillin 500mg', 'Bacterial infection treatment', '30042019', 'strip', '10 capsules per strip', 10, 'AMX500-Y1', '2023-11-20', '2025-11-19', 'RACK-B2', 85.00, 110.00, 23, 1, 0, '2026-01-16 20:38:11', '2026-01-20 00:01:45'),
+(7, 'Cetirizine 10mg', 'Allergy relief', '30049099', 'strip', '10 tablets per strip', 15, 'CTZ10-C3', '2024-03-05', '2027-03-04', 'RACK-C1', 12.00, 20.00, 196, 1, 0, '2026-01-16 20:38:11', '2026-01-19 23:40:41'),
 (8, 'Azithromycin 500mg', 'Respiratory and bacterial infections', '30042015', 'strip', '3 tablets per strip', 5, 'AZM500-Z7', '2024-01-01', '2026-12-31', 'RACK-B3', 95.00, 130.00, 18, 1, 0, '2026-01-16 20:38:11', '2026-01-16 20:38:11'),
-(9, 'Pantoprazole 40mg', 'Acid reflux and GERD', '30049099', 'strip', '10 tablets per strip', 20, 'PAN40-P5', '2023-10-15', '2025-10-14', 'RACK-D1', 22.00, 35.00, 90, 1, 0, '2026-01-16 20:38:11', '2026-01-16 20:38:11'),
-(10, 'Vitamin C Tablets', 'Immunity booster', '21069099', 'bottle', '60 tablets per bottle', 5, 'VITC-60-01', '2024-04-01', '2026-03-31', 'RACK-E1', 110.00, 180.00, 35, 1, 0, '2026-01-16 20:38:11', '2026-01-16 20:38:11'),
-(11, 'Cough Syrup', 'Relief from cough and cold', '30049099', 'bottle', '100 ml bottle', 10, 'CS-100-09', '2023-08-01', '2025-07-31', 'RACK-F2', 48.00, 75.00, 22, 1, 0, '2026-01-16 20:38:11', '2026-01-16 20:38:11'),
-(12, 'Ibuprofen 400mg', 'Pain and inflammation relief', '30045020', 'strip', '10 tablets per strip', 15, 'IBU400-I4', '2024-02-20', '2026-02-19', 'RACK-A2', 100.00, 200.00, 90, 1, 0, '2026-01-16 20:38:11', '2026-01-17 10:11:02'),
-(13, 'Insulin Injection', 'Diabetes management', '30043100', 'vial', '10 ml vial', 1, 'INS-10ML-77', '2024-06-01', '2025-05-31', 'COLD-RACK-1', 100.00, 200.00, 8, 1, 0, '2026-01-16 20:38:11', '2026-01-17 10:11:02'),
-(14, 'Metformin 500mg', 'Diabetes management', '30049099', 'strip', '10 tablets per strip', 20, 'MET500-OLD', '2022-01-01', '2024-01-01', 'RACK-D2', 14.00, 28.00, 15, 0, 1, '2026-01-16 20:38:11', '2026-01-17 09:49:00');
+(9, 'Pantoprazole 40mg', 'Acid reflux and GERD', '30049099', 'strip', '10 tablets per strip', 20, 'PAN40-P5', '2023-10-15', '2025-10-14', 'RACK-D1', 22.00, 35.00, 86, 1, 0, '2026-01-16 20:38:11', '2026-01-19 23:36:56'),
+(10, 'Vitamin C Tablets', 'Immunity booster', '21069099', 'bottle', '60 tablets per bottle', 5, 'VITC-60-01', '2024-04-01', '2026-03-31', 'RACK-E1', 110.00, 180.00, 29, 1, 0, '2026-01-16 20:38:11', '2026-01-20 00:01:45'),
+(11, 'Cough Syrup', 'Relief from cough and cold', '30049099', 'bottle', '100 ml bottle', 10, 'CS-100-09', '2023-08-01', '2025-07-31', 'RACK-F2', 48.00, 75.00, 18, 1, 0, '2026-01-16 20:38:11', '2026-01-20 00:01:45'),
+(12, 'Ibuprofen 400mg', 'Pain and inflammation relief', '30045020', 'strip', '10 tablets per strip', 15, 'IBU400-I4', '2024-02-20', '2026-02-19', 'RACK-A2', 100.00, 200.00, 89, 1, 0, '2026-01-16 20:38:11', '2026-01-19 23:28:54'),
+(13, 'Insulin Injection', 'Diabetes management', '30043100', 'vial', '10 ml vial', 1, 'INS-10ML-77', '2024-06-01', '2025-05-31', 'COLD-RACK-1', 100.00, 200.00, 4, 1, 0, '2026-01-16 20:38:11', '2026-01-20 00:01:45'),
+(14, 'Metformin 500mg', 'Diabetes management', '30049099', 'strip', '10 tablets per strip', 20, 'MET500-OLD', '2022-01-01', '2024-01-01', 'RACK-D2', 14.00, 28.00, 5, 0, 1, '2026-01-16 20:38:11', '2026-01-19 23:40:41');
 
 -- --------------------------------------------------------
 
@@ -166,21 +166,28 @@ INSERT INTO `purchase_invoice_items` (`id`, `purchase_invoice_id`, `medicine_id`
 
 CREATE TABLE `sales_invoices` (
   `id` bigint UNSIGNED NOT NULL,
+  `invoice_id` varchar(64) NOT NULL,
   `invoice_date` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `payment_mode` varchar(16) NOT NULL,
   `customer_name` varchar(255) DEFAULT NULL,
   `doctor_name` varchar(255) DEFAULT NULL,
   `total_medicines` int NOT NULL DEFAULT '0',
   `total_price` decimal(12,2) NOT NULL DEFAULT '0.00',
-  `discount` int NOT NULL DEFAULT '10',
-  `discount_price` decimal(12,2) NOT NULL DEFAULT '0.00',
+  `total_discount_price` decimal(12,2) NOT NULL DEFAULT '0.00',
   `final_selling_price` decimal(12,2) NOT NULL DEFAULT '0.00',
-  `remarks` text,
-  `mark_as_paid` tinyint(1) NOT NULL DEFAULT '0',
-  `is_applied_item_level_discount` tinyint(1) NOT NULL DEFAULT '1',
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `sales_invoices`
+--
+
+INSERT INTO `sales_invoices` (`id`, `invoice_id`, `invoice_date`, `payment_mode`, `customer_name`, `doctor_name`, `total_medicines`, `total_price`, `total_discount_price`, `final_selling_price`, `created_at`, `updated_at`) VALUES
+(2, 'PMS-20260119-86174', '2026-01-19 23:36:23', 'Cash', 'Pratik Kumar Pradhan', 'Swayam Prakash', 2, 610.00, 0.00, 552.50, '2026-01-19 23:36:23', '2026-01-19 23:36:23'),
+(3, 'PMS-20260119-83070', '2026-01-19 23:40:42', 'Online', 'Pratik Kumar Pradhan', 'Swayam Prakash', 2, 320.00, 30.00, 290.00, '2026-01-19 23:40:42', '2026-01-19 23:40:42'),
+(4, 'PMS-20260120-15480', '2026-01-20 00:01:33', 'Online', 'Pratik Kumar Pradhan', 'Swayam Prakash', 0, 0.00, 0.00, 0.00, '2026-01-20 00:01:33', '2026-01-20 00:01:33'),
+(5, 'PMS-20260120-44218', '2026-01-20 00:01:46', 'Online', 'Pratik Kumar Pradhan', 'Swayam Prakash', 4, 950.00, 84.50, 865.50, '2026-01-20 00:01:46', '2026-01-20 00:01:46');
 
 -- --------------------------------------------------------
 
@@ -200,6 +207,23 @@ CREATE TABLE `sales_invoice_items` (
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `sales_invoice_items`
+--
+
+INSERT INTO `sales_invoice_items` (`id`, `sales_invoice_id`, `medicine_id`, `quantity`, `mrp`, `discount`, `discount_price`, `selling_price`, `created_at`, `updated_at`) VALUES
+(2, 2, 9, 2, 35.00, 5, 3.50, 66.50, '2026-01-19 23:36:23', '2026-01-19 23:36:23'),
+(3, 2, 10, 3, 180.00, 10, 54.00, 486.00, '2026-01-19 23:36:23', '2026-01-19 23:36:23'),
+(5, 3, 7, 2, 20.00, 5, 2.00, 38.00, '2026-01-19 23:40:42', '2026-01-19 23:40:42'),
+(6, 3, 14, 10, 28.00, 10, 28.00, 252.00, '2026-01-19 23:40:42', '2026-01-19 23:40:42'),
+(7, 4, 11, 2, 75.00, 5, 7.50, 142.50, '2026-01-20 00:01:33', '2026-01-20 00:01:33'),
+(8, 4, 10, 1, 180.00, 10, 18.00, 162.00, '2026-01-20 00:01:33', '2026-01-20 00:01:33'),
+(9, 4, 13, 2, 200.00, 12, 48.00, 352.00, '2026-01-20 00:01:33', '2026-01-20 00:01:33'),
+(10, 5, 11, 2, 75.00, 5, 7.50, 142.50, '2026-01-20 00:01:46', '2026-01-20 00:01:46'),
+(11, 5, 10, 1, 180.00, 10, 18.00, 162.00, '2026-01-20 00:01:46', '2026-01-20 00:01:46'),
+(12, 5, 13, 2, 200.00, 12, 48.00, 352.00, '2026-01-20 00:01:46', '2026-01-20 00:01:46'),
+(13, 5, 6, 2, 110.00, 5, 11.00, 209.00, '2026-01-20 00:01:46', '2026-01-20 00:01:46');
 
 -- --------------------------------------------------------
 
@@ -351,8 +375,10 @@ ALTER TABLE `purchase_invoice_items`
 --
 ALTER TABLE `sales_invoices`
   ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `uq_si_invoice_id` (`invoice_id`),
+  ADD KEY `idx_si_id` (`invoice_id`),
   ADD KEY `idx_si_date` (`invoice_date`),
-  ADD KEY `idx_si_ild` (`is_applied_item_level_discount`);
+  ADD KEY `idx_si_id_date` (`invoice_id`,`invoice_date`);
 
 --
 -- Indexes for table `sales_invoice_items`
@@ -428,13 +454,13 @@ ALTER TABLE `purchase_invoice_items`
 -- AUTO_INCREMENT for table `sales_invoices`
 --
 ALTER TABLE `sales_invoices`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `sales_invoice_items`
 --
 ALTER TABLE `sales_invoice_items`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT for table `store_profile`
