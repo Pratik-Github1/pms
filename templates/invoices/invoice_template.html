@@ -41,6 +41,25 @@
         .footer-section { margin-top: 60px; }
         .signature-box { text-align: right; margin-top: 40px; }
         .footer-note { font-size: 10px; color: #999; border-top: 1px solid #eee; padding-top: 10px; margin-top: 20px; }
+        .signature-box { 
+            text-align: right; 
+            margin-top: 20px; 
+            position: relative;
+        }
+        .digital-sign {
+            height: 60px; /* Adjust height based on your image aspect ratio */
+            margin-bottom: -15px; /* Pulls the text up to overlap slightly with the sign */
+            display: block;
+            margin-left: auto;
+        }
+        .sign-text {
+            font-size: 13px;
+            font-weight: bold;
+            border-top: 1px solid #ddd;
+            display: inline-block;
+            padding-top: 5px;
+            min-width: 150px;
+        }
     </style>
 </head>
 <body>
@@ -126,9 +145,15 @@
 
         <div class="footer-section">
             <div class="signature-box">
-                <p style="font-size: 11px; margin-bottom: 40px;">For <strong>{{ store.store_name }}</strong></p>
-                <p class="data-text">Authorized Signatory</p>
-                <p style="font-size: 11px; color: #777;">({{ store.owner_name }})</p>
+                <p style="font-size: 11px; margin-bottom: 5px;">For <strong>{{ store.store_name }}</strong></p>
+                
+                {% if signature_path %}
+                    <img src="{{ signature_path }}" class="digital-sign">
+                {% else %}
+                    <div style="height: 60px;"></div> {% endif %}
+                
+                <div class="sign-text" style="margin-top: 10px;">Authorized Signatory</div>
+                <p style="font-size: 11px; color: #777; margin: 0;">({{ store.owner_name }})</p>
             </div>
 
             <div class="footer-note">
