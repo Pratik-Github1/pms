@@ -148,33 +148,31 @@ CREATE TABLE `purchase_invoice_items` (
   KEY `idx_pi_item_med` (`medicine_id`)
 );
 
-
 CREATE TABLE `sales_invoices` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
 
+  `invoice_id` VARCHAR(64) NOT NULL,
   `invoice_date` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
   `payment_mode` VARCHAR(16) NOT NULL,
   `customer_name` VARCHAR(255) NULL,
   `doctor_name` VARCHAR(255) NULL,
+
   `total_medicines` INT NOT NULL DEFAULT 0,
   `total_price` DECIMAL(12,2) NOT NULL DEFAULT 0.00,
-
-  `discount` INT NOT NULL DEFAULT 10,
-  `discount_price` DECIMAL(12,2) NOT NULL DEFAULT 0.00,
+  `total_discount_price` DECIMAL(12,2) NOT NULL DEFAULT 0.00,
   `final_selling_price` DECIMAL(12,2) NOT NULL DEFAULT 0.00,
-
-  `remarks` TEXT NULL,
-
-  `mark_as_paid` BOOLEAN NOT NULL DEFAULT FALSE,
-  `is_applied_item_level_discount` BOOLEAN NOT NULL DEFAULT TRUE,
 
   `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
   PRIMARY KEY (`id`),
 
+  UNIQUE KEY `uq_si_invoice_id` (`invoice_id`),
+
+  KEY `idx_si_id` (`invoice_id`),
   KEY `idx_si_date` (`invoice_date`),
-  KEY `idx_si_ild` (`is_applied_item_level_discount`)
+  KEY `idx_si_id_date` (`invoice_id`, `invoice_date`)
 );
 
 CREATE TABLE `sales_invoice_items` (

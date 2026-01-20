@@ -1,13 +1,14 @@
 from django.urls import path
 from django.conf import settings
 from apps.views import createSalesInvoicePage
-from core.apis.Sales import SalesInvoiceCRUDView, SalesInvoiceItemCRUDView
+from core.apis.Sales import SalesInvoiceCRUDView, SalesInvoiceListView
 from core.authentication.auth import *
 from django.conf.urls.static import static
 from core.apis.StoreInformations import *
 from core.apis.Medicine import *
 from core.apis.Supplier import *
 from core.apis.Purchases import *
+from core.apis.Invoices import *
 
 app_name = "core"
 
@@ -32,10 +33,10 @@ urlpatterns = [
     path('purchaseInvoicesList', PurchaseInvoiceListView.as_view(), name='purchaseInvoicesList'),
 
     path("salesInvoices", SalesInvoiceCRUDView.as_view(), name="salesInvoices"),
-    path("salesInvoiceItems", SalesInvoiceItemCRUDView.as_view(), name="salesInvoiceItems"),
+    path("salesInvoicesList", SalesInvoiceListView.as_view(), name="salesInvoicesList"),
 
+    path('generateInvoice', InvoiceGenerate.as_view(), name='generateInvoice'),
 
-     
 ]
 
 if settings.DEBUG:

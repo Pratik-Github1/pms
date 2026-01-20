@@ -229,7 +229,9 @@ class GetMedicineInventoryListSmall(APIView):
     def get(self, request):
         suppliers = MedicineInventory.objects.values(
             "id",
-            "name"
+            "name",
+            "mrp",
+            "rack_location"
         ).order_by("-id")
 
         return JsonResponse({

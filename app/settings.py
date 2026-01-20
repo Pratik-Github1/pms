@@ -252,3 +252,8 @@ MEDIA_ROOT = BASE_DIR / "media"
 # Default Auto Field
 # ------------------------------------------------------------------------------
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# ------------------------------------------------------------------------------
+# WKHTMLTOPDF
+# ------------------------------------------------------------------------------
+PATH_WKHTMLTOPDF = r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe'

@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: 'Helvetica', 'Arial', sans-serif; color: #222; margin: 0; padding: 0; line-height: 1.5; }
+        .invoice-container { padding: 40px; }
+        
+        /* Header Section */
+        .header-table { width: 100%; border-bottom: 2px solid #333; margin-bottom: 20px; padding-bottom: 10px; }
+        .store-title { font-size: 28px; font-weight: bold; color: #1a73e8; margin: 0; }
+        .store-details { font-size: 11px; color: #555; margin-top: 5px; }
+        
+        /* Layout Grid */
+        .info-grid { width: 100%; margin-bottom: 30px; }
+        .info-column { vertical-align: top; width: 50%; }
+        
+        .section-title { font-size: 10px; text-transform: uppercase; color: #888; margin-bottom: 5px; font-weight: bold; }
+        .data-text { font-size: 13px; margin: 0; }
+
+        /* Items Table */
+        .items-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        .items-table th { 
+            background-color: #f2f2f2; 
+            border-top: 1px solid #333; 
+            border-bottom: 1px solid #333; 
+            padding: 10px; 
+            font-size: 12px; 
+            text-align: left; 
+        }
+        .items-table td { padding: 12px 10px; border-bottom: 1px solid #eee; font-size: 12px; }
+        
+        /* Totals */
+        .totals-wrapper { width: 100%; margin-top: 20px; }
+        .total-row { text-align: right; }
+        .total-label { font-size: 13px; padding-right: 20px; color: #555; }
+        .total-value { font-size: 13px; font-weight: bold; width: 120px; }
+        .grand-total { font-size: 18px; color: #1a73e8; border-top: 2px solid #1a73e8; padding-top: 5px; }
+
+        /* Footer */
+        .footer-section { margin-top: 60px; }
+        .signature-box { text-align: right; margin-top: 40px; }
+        .footer-note { font-size: 10px; color: #999; border-top: 1px solid #eee; padding-top: 10px; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="invoice-container">
+        
+        <table class="header-table">
+            <tr>
+                <td style="width: 70%;">
+                    {% if logo_url %}<img src="{{ logo_url }}" style="height: 60px; margin-bottom: 10px;">{% endif %}
+                    <h1 class="store-title">{{ store.store_name }}</h1>
+                    <div class="store-details">
+                        {{ store.address_line }}, {{ store.city }}<br>
+                        {{ store.state }}, {{ store.pincode }}<br>
+                        <strong>GSTIN :</strong> {{ store.gst_number }} | <strong>DL NO :</strong> {{ store.drug_license_number }}
+                    </div>
+                </td>
+                <td style="width: 30%; text-align: right; vertical-align: bottom;">
+                    <div style="font-size: 24px; color: #ccc; font-weight: bold; margin-bottom: 5px;">TAX INVOICE</div>
+                    <div class="data-text"><strong>#{{ invoice.invoice_id }}</strong></div>
+                    <div class="data-text">{{ invoice.invoice_date|date:"D, d M Y" }}</div>
+                </td>
+            </tr>
+        </table>
+
+        <table class="info-grid">
+            <tr>
+                <td class="info-column">
+                    <div class="section-title">Billed To</div>
+                    <p class="data-text"><strong>{{ invoice.customer_name|default:"General Customer" }}</strong></p>
+                    <p class="data-text" style="color: #030000;">Doctor : {{ invoice.doctor_name|default:"N/A" }}</p>
+                </td>
+                <td class="info-column" style="text-align: right;">
+                    <div class="section-title">Payment Info</div>
+                    <p class="data-text">Method: {{ invoice.payment_mode }}</p>
+                    <p class="data-text">Status: <strong>PAID</strong></p>
+                </td>
+            </tr>
+        </table>
+
+        <table class="items-table">
+            <thead>
+                <tr>
+                    <th style="width: 5%;">#</th>
+                    <th style="width: 45%;">Description of Medicines</th>
+                    <th style="width: 15%; text-align: center;">MRP</th>
+                    <th style="width: 10%; text-align: center;">Qty</th>
+                    <th style="width: 10%; text-align: center;">Disc%</th>
+                    <th style="width: 15%; text-align: right;">Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td><strong>{{ item.name }}</strong></td>
+                    <td style="text-align: center;">{{ item.mrp }}</td>
+                    <td style="text-align: center;">{{ item.qty }}</td>
+                    <td style="text-align: center;">{{ item.discount }}</td>
+                    <td style="text-align: right;">{{ item.selling_price }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <table class="totals-wrapper">
+            <tr class="total-row">
+                <td class="total-label">Total Items</td>
+                <td class="total-value">{{ invoice.total_medicines }}</td>
+            </tr>
+            <tr class="total-row">
+                <td class="total-label">Sub Total (MRP)</td>
+                <td class="total-value">{{ invoice.total_price }}</td>
+            </tr>
+            <tr class="total-row">
+                <td class="total-label">Cash Discount</td>
+                <td class="total-value">- {{ invoice.total_discount_price }}</td>
+            </tr>
+            <tr class="total-row">
+                <td class="total-label grand-total">Net Amount Payable</td>
+                <td class="total-value grand-total">₹ {{ invoice.final_selling_price }}</td>
+            </tr>
+        </table>
+
+        <div class="footer-section">
+            <div class="signature-box">
+                <p style="font-size: 11px; margin-bottom: 40px;">For <strong>{{ store.store_name }}</strong></p>
+                <p class="data-text">Authorized Signatory</p>
+                <p style="font-size: 11px; color: #777;">({{ store.owner_name }})</p>
+            </div>
+
+            <div class="footer-note">
+                <strong>Terms & Conditions:</strong><br>
+                {{ store.invoice_footer_note|default:"1. Goods once sold will not be taken back. 2. Subject to local jurisdiction." }}
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>

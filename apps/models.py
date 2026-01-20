@@ -1,3 +1,5 @@
+import random
+import datetime
 from django.db import models
 
 class Users(models.Model):
@@ -183,6 +185,7 @@ class PurchaseInvoiceItem(models.Model):
         ]
 
 class SalesInvoice(models.Model):
+    invoice_id = models.CharField(max_length=64, db_index=True, unique=True)
     invoice_date = models.DateTimeField(db_index=True, auto_now_add=True)
     payment_mode = models.CharField(max_length=16)
     customer_name = models.CharField(max_length=255, blank=True, null=True)
@@ -190,12 +193,8 @@ class SalesInvoice(models.Model):
 
     total_medicines = models.IntegerField(default=0)
     total_price = models.DecimalField(max_digits=12, decimal_places=2, default=0)
-    discount = models.IntegerField(default=10)
-    discount_price = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+    total_discount_price = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     final_selling_price = models.DecimalField(max_digits=12, decimal_places=2, default=0)
-    remarks = models.TextField(blank=True, null=True)
-    mark_as_paid = models.BooleanField(default=False)
-    is_applied_item_level_discount = models.BooleanField(default=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -203,9 +202,31 @@ class SalesInvoice(models.Model):
     class Meta:
         db_table = "sales_invoices"
         indexes = [
+            models.Index(fields=["invoice_id"], name="idx_si_id"),
             models.Index(fields=["invoice_date"], name="idx_si_date"),
-            models.Index(fields=["is_applied_item_level_discount"], name="idx_si_ild"),
+            models.Index(fields=["invoice_id", "invoice_date"], name="idx_si_id_date"),
         ]
+    def save(self, *args, **kwargs):
+        if not self.invoice_id:
+            self.invoice_id = self.generate_invoice_id()
+        super(SalesInvoice, self).save(*args, **kwargs)
+
+    def generate_invoice_id(self):
+        """
+        Generates a unique ID: PMS-YYYYMMDD-RANDOM
+        Example: PMS-20231027-84291
+        """
+        date_str = datetime.datetime.now().strftime('%Y%m%d')
+        # Generate a random 5-digit integer
+        random_bits = random.randint(10000, 99999)
+        new_id = f"PMS-{date_str}-{random_bits}"
+        
+        # Double check uniqueness in the database
+        while SalesInvoice.objects.filter(invoice_id=new_id).exists():
+            random_bits = random.randint(10000, 99999)
+            new_id = f"PMS-{date_str}-{random_bits}"
+            
+        return new_id
 
 class SalesInvoiceItem(models.Model):
     sales_invoice_id = models.BigIntegerField(db_index=True)

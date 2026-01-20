@@ -32,10 +32,9 @@
                         <thead class="table-light">
                             <tr>
                                 <th>#</th>
-                                <th>Customer</th>
                                 <th>Invoice Details</th>
-                                <th>Amount</th>
-                                <th>Total Items</th>
+                                <th>Customer Name</th>
+                                <th>Sales Details</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -61,108 +60,177 @@
 </div>
 
 <script>
-document.addEventListener("DOMContentLoaded", function () {
+    document.addEventListener("DOMContentLoaded", function () {
 
-    const tableBody = document.getElementById("salesTableBody");
-    const pagination = document.getElementById("pagination");
-    const paginationInfo = document.getElementById("paginationInfo");
-    const searchInput = document.getElementById("searchInput");
+        const tableBody = document.getElementById("salesTableBody");
+        const pagination = document.getElementById("pagination");
+        const paginationInfo = document.getElementById("paginationInfo");
+        const searchInput = document.getElementById("searchInput");
 
-    let currentPage = 1;
-    let pageSize = 10;
-    let currentSearch = "";
+        let currentPage = 1;
+        let pageSize = 10;
+        let currentSearch = "";
 
-    function fetchSales(page = 1) {
+        function fetchSales(page = 1) {
 
-        tableBody.innerHTML = `
-            <tr>
-                <td colspan="6" class="text-center text-muted">Loading...</td>
-            </tr>
-        `;
-
-        fetch(`/apis/salesInvoicesList?page=${page}&page_size=${pageSize}&search=${currentSearch}`)
-            .then(res => res.json())
-            .then(res => {
-
-                const data = res.results.data;
-                const total = res.count;
-
-                tableBody.innerHTML = "";
-
-                if (!data.length) {
-                    tableBody.innerHTML = `
-                        <tr>
-                            <td colspan="6" class="text-center text-muted">
-                                No sales invoices found
-                            </td>
-                        </tr>`;
-                    return;
-                }
-
-                data.forEach((item, index) => {
-                    tableBody.innerHTML += `
-                        <tr>
-                            <td>${(page - 1) * pageSize + index + 1}</td>
-                            <td>${item.customer_name}</td>
-                            <td>
-                                <div>${item.invoice_number}</div>
-                                <small>${item.invoice_date}</small>
-                            </td>
-                            <td>
-                                <div>${item.total_amount}</div>
-                                <small>${item.payment_mode}</small>
-                            </td>
-                            <td>${item.total_items}</td>
-                            <td class="text-center">
-                                <button class="btn btn-sm btn-outline-primary"
-                                        onclick="window.location.href='/createSalesInvoice/?id=${item.id}'">
-                                    <i class="mdi mdi-eye"></i>
-                                </button>
-                            </td>
-                        </tr>
-                    `;
-                });
-
-                renderPagination(total, page);
-                renderInfo(page, total);
-            });
-    }
-
-    function renderPagination(total, page) {
-        pagination.innerHTML = "";
-        const totalPages = Math.ceil(total / pageSize);
-
-        for (let i = 1; i <= totalPages; i++) {
-            pagination.innerHTML += `
-                <li class="page-item ${i === page ? "active" : ""}">
-                    <a class="page-link" href="#">${i}</a>
-                </li>
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="6" class="text-center text-muted">Loading...</td>
+                </tr>
             `;
+
+            fetch(`/apis/salesInvoicesList?page=${page}&page_size=${pageSize}&search=${currentSearch}`)
+                .then(res => res.json())
+                .then(res => {
+
+                    const data = res.results.data;
+                    const total = res.count;
+
+                    tableBody.innerHTML = "";
+
+                    if (!data.length) {
+                        tableBody.innerHTML = `
+                            <tr>
+                                <td colspan="6" class="text-center text-muted">
+                                    No sales invoices found
+                                </td>
+                            </tr>`;
+                        return;
+                    }
+
+                    data.forEach((item, index) => {
+                        tableBody.innerHTML += `
+                            <tr>
+                                <td>${(page - 1) * pageSize + index + 1}</td>
+                                <td>
+                                    <div><strong>${item.invoice_id}</strong></div>
+                                    <small class="text-muted">${item.invoice_date}</small>
+                                </td>
+                                <td>${item.customer_name}</td>
+                                <td>
+                                    <div class="small">Total: ${item.total_price}</div>
+                                    <div class="small text-danger">Disc: ${item.total_discount_price}</div>
+                                    <div class="small text-success font-weight-bold">Net: ${item.final_selling_price}</div>
+                                </td>
+                                <td class="text-center">
+                                    <button class="btn btn-sm btn-outline-primary" 
+                                            title="View Invoice"
+                                            onclick="window.location.href='/createSalesNote/?id=${item.id}'">
+                                        <i class="mdi mdi-eye"></i>
+                                    </button>
+                                    
+                                    <button class="btn btn-sm btn-gradient-info download-btn" 
+                                            title="Download PDF"
+                                            id="download-btn-${item.id}"
+                                            onclick="downloadInvoice(${item.id}, '${item.invoice_id}')">
+                                        <i class="mdi mdi-download"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        `;
+                    });
+
+                    renderPagination(total, page);
+                    renderInfo(page, total);
+                });
+        }
+        
+        // Function to handle PDF Download
+        window.downloadInvoice = function(id, invoiceNo) {
+            const btn = document.getElementById(`download-btn-${id}`);
+            const originalContent = btn.innerHTML;
+            
+            // Show Loading State
+            btn.disabled = true;
+            btn.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>`;
+
+            fetch('/apis/generateInvoice', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    // Add X-CSRFToken if your API requires it
+                    'X-CSRFToken': getCookie('csrftoken') 
+                },
+                body: JSON.stringify({ invoice_id: id })
+            })
+            .then(response => {
+                if (!response.ok) throw new Error('Network response was not ok');
+                return response.blob();
+            })
+            .then(blob => {
+                // Create a link to download the blob
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                a.download = `Invoice_${invoiceNo}.pdf`;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                
+                // Reset Button
+                btn.disabled = false;
+                btn.innerHTML = originalContent;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Failed to download invoice. Please try again.');
+                btn.disabled = false;
+                btn.innerHTML = originalContent;
+            });
+        };
+
+        // Helper function to get CSRF token from cookies
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
         }
 
-        pagination.querySelectorAll(".page-link").forEach(link => {
-            link.onclick = e => {
-                e.preventDefault();
-                currentPage = Number(link.textContent);
-                fetchSales(currentPage);
-            };
+        function renderPagination(total, page) {
+            pagination.innerHTML = "";
+            const totalPages = Math.ceil(total / pageSize);
+
+            for (let i = 1; i <= totalPages; i++) {
+                pagination.innerHTML += `
+                    <li class="page-item ${i === page ? "active" : ""}">
+                        <a class="page-link" href="#">${i}</a>
+                    </li>
+                `;
+            }
+
+            pagination.querySelectorAll(".page-link").forEach(link => {
+                link.onclick = e => {
+                    e.preventDefault();
+                    currentPage = Number(link.textContent);
+                    fetchSales(currentPage);
+                };
+            });
+        }
+
+        function renderInfo(page, total) {
+            const start = (page - 1) * pageSize + 1;
+            const end = Math.min(page * pageSize, total);
+            paginationInfo.innerText = `Showing ${start}–${end} of ${total} invoices`;
+        }
+
+        searchInput.addEventListener("keyup", function () {
+            currentSearch = this.value;
+            currentPage = 1;
+            fetchSales();
         });
-    }
 
-    function renderInfo(page, total) {
-        const start = (page - 1) * pageSize + 1;
-        const end = Math.min(page * pageSize, total);
-        paginationInfo.innerText = `Showing ${start}–${end} of ${total} invoices`;
-    }
-
-    searchInput.addEventListener("keyup", function () {
-        currentSearch = this.value;
-        currentPage = 1;
         fetchSales();
     });
-
-    fetchSales();
-});
 </script>
 
 {% endblock %}
