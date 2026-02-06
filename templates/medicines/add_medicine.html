@@ -41,8 +41,8 @@
                         </div>
                         <div class="col-md-4">
                             <div class="form-group">
-                                <label>Manufacturing Date <span class="text-danger">*</span></label>
-                                <input type="date" class="form-control" id="manufacturing_date" required>
+                                <label>Quantity <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" id="current_stock" required>
                             </div>
                         </div>
 
@@ -163,7 +163,7 @@ document.addEventListener("DOMContentLoaded", function () {
         return {
             name: document.getElementById("name").value.trim(),
             batch_number: document.getElementById("batch_number").value.trim(),
-            manufacturing_date: document.getElementById("manufacturing_date").value,
+            current_stock: document.getElementById("current_stock").value,
             expiry_date: document.getElementById("expiry_date").value,
             hsn_code: document.getElementById("hsn_code").value.trim(),
             packing_details: document.getElementById("packing_details").value.trim(),

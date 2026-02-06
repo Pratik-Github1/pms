@@ -22,7 +22,7 @@ class MedicineCRUDView(APIView):
         data = request.data
 
         required_fields = [
-            "name", "batch_number", "manufacturing_date",
+            "name", "batch_number", "current_stock",
             "expiry_date", "packing_details", "rack_location",
             "purchase_price", "mrp"
         ]
@@ -49,12 +49,11 @@ class MedicineCRUDView(APIView):
                     packing_details=data.get("packing_details"),
                     low_stock_alert=data.get("low_stock_alert", 0),
                     batch_number=data.get("batch_number"),
-                    manufacturing_date=data.get("manufacturing_date"),
                     expiry_date=data.get("expiry_date"),
                     rack_location=data.get("rack_location"),
                     purchase_price=data.get("purchase_price"),
                     mrp=data.get("mrp"),
-                    current_stock=data.get("current_stock", 0),
+                    current_stock=data.get("current_stock"),
                     is_active=True,
                     is_expired=False,
                 )
@@ -98,7 +97,6 @@ class MedicineCRUDView(APIView):
                 "packing_details": medicine.packing_details,
                 "low_stock_alert": medicine.low_stock_alert,
                 "batch_number": medicine.batch_number,
-                "manufacturing_date": medicine.manufacturing_date,
                 "expiry_date": medicine.expiry_date,
                 "rack_location": medicine.rack_location,
                 "purchase_price": medicine.purchase_price,
@@ -177,7 +175,6 @@ class MedicineInventoryListSerializer(serializers.ModelSerializer):
             "medicine_uses",
             "low_stock_alert",
             "batch_number",
-            "manufacturing_date",
             "expiry_date",
             "rack_location",
             "mrp",
