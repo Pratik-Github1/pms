@@ -1,66 +1,137 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="UTF-8">
     <style>
-        /* ADDED: letter-spacing and text-rendering to solve the "close letters" issue */
-        body { 
-            font-family: 'Helvetica', 'Arial', sans-serif; 
-            color: #222; 
-            margin: 0; 
-            padding: 0; 
-            line-height: 1.5; 
-            letter-spacing: 0.02em; 
+        body {
+            font-family: 'Helvetica', 'Arial', sans-serif;
+            color: #222;
+            margin: 0;
+            padding: 0;
+            line-height: 1.5;
+            letter-spacing: 0.02em;
             text-rendering: optimizeLegibility;
         }
-        .invoice-container { padding: 40px; }
-        
+
+        .invoice-container {
+            padding: 40px;
+        }
+
         /* Header Section */
-        .header-table { width: 100%; border-bottom: 2px solid #333; margin-bottom: 20px; padding-bottom: 10px; }
-        .store-title { font-size: 28px; font-weight: bold; color: #2e7d32; margin: 0; }
-        .store-details { font-size: 11px; color: #555; margin-top: 5px; }
-        
+        .header-table {
+            width: 100%;
+            border-bottom: 2px solid #333;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+        }
+
+        .store-title {
+            font-size: 28px;
+            font-weight: bold;
+            color: #2e7d32;
+            margin: 0;
+        }
+
+        .store-details {
+            font-size: 11px;
+            color: #555;
+            margin-top: 5px;
+        }
+
         /* Layout Grid */
-        .info-grid { width: 100%; margin-bottom: 30px; }
-        .info-column { vertical-align: top; width: 50%; }
-        
-        .section-title { font-size: 10px; text-transform: uppercase; color: #888; margin-bottom: 5px; font-weight: bold; }
-        .data-text { font-size: 13px; margin: 0; }
+        .info-grid {
+            width: 100%;
+            margin-bottom: 30px;
+        }
+
+        .info-column {
+            vertical-align: top;
+            width: 50%;
+        }
+
+        .section-title {
+            font-size: 10px;
+            text-transform: uppercase;
+            color: #888;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .data-text {
+            font-size: 13px;
+            margin: 0;
+        }
 
         /* Items Table */
-        .items-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        .items-table th { 
-            background-color: #f2f2f2; 
-            border-top: 1px solid #333; 
-            border-bottom: 1px solid #333; 
-            padding: 10px; 
-            font-size: 12px; 
-            text-align: left; 
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
         }
-        .items-table td { padding: 12px 10px; border-bottom: 1px solid #eee; font-size: 12px; }
-        
+
+        .items-table th {
+            background-color: #f2f2f2;
+            border-top: 1px solid #333;
+            border-bottom: 1px solid #333;
+            padding: 10px;
+            font-size: 12px;
+            text-align: left;
+        }
+
+        .items-table td {
+            padding: 12px 10px;
+            border-bottom: 1px solid #eee;
+            font-size: 12px;
+        }
+
         /* Totals */
-        .totals-wrapper { width: 100%; margin-top: 20px; }
-        .total-row { text-align: right; }
-        .total-label { font-size: 13px; padding-right: 20px; color: #555; }
-        .total-value { font-size: 13px; font-weight: bold; width: 120px; }
-        .grand-total { font-size: 18px; color: #1a73e8; border-top: 2px solid #1a73e8; padding-top: 5px; }
+        .totals-wrapper {
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .total-row {
+            text-align: right;
+        }
+
+        .total-label {
+            font-size: 13px;
+            padding-right: 20px;
+            color: #555;
+        }
+
+        .total-value {
+            font-size: 13px;
+            font-weight: bold;
+            width: 120px;
+        }
+
+        .grand-total {
+            font-size: 18px;
+            color: #1a73e8;
+            border-top: 2px solid #1a73e8;
+            padding-top: 5px;
+        }
 
         /* Footer */
-        .footer-section { margin-top: 60px; }
-        .signature-box { text-align: right; margin-top: 40px; }
-        .footer-note { font-size: 10px; color: #999; border-top: 1px solid #eee; padding-top: 10px; margin-top: 20px; }
-        .signature-box { 
-            text-align: right; 
-            margin-top: 20px; 
+        .footer-section {
+            margin-top: 60px;
+        }
+
+        .signature-box {
+            text-align: right;
+            margin-top: 20px;
             position: relative;
         }
+
         .digital-sign {
-            height: 60px; /* Adjust height based on your image aspect ratio */
-            margin-bottom: -15px; /* Pulls the text up to overlap slightly with the sign */
+            height: 60px;
+            margin-bottom: -15px;
             display: block;
             margin-left: auto;
         }
+
         .sign-text {
             font-size: 13px;
             font-weight: bold;
@@ -69,21 +140,28 @@
             padding-top: 5px;
             min-width: 150px;
         }
+
+        .footer-note {
+            font-size: 10px;
+            color: #999;
+            border-top: 1px solid #eee;
+            padding-top: 10px;
+            margin-top: 20px;
+        }
     </style>
 </head>
+
 <body>
     <div class="invoice-container">
-        
+
         <table class="header-table">
             <tr>
                 <td style="width: 70%;">
                     {% if logo_url %}<img src="{{ logo_url }}" style="height: 60px; margin-bottom: 10px;">{% endif %}
                     <h1 class="store-title">{{ store.store_name }}</h1>
-                    <div class="store-details">
-                        {{ store.address_line }}, {{ store.city }}<br>
-                        {{ store.state }}, {{ store.pincode }}<br>
-                        <strong>GSTIN :</strong> {{ store.gst_number }} | <strong>DL NO :</strong> {{ store.drug_license_number }}
-                    </div>
+                    <div class="store-details">{{ store.address_line }}, {{ store.city }}<br>{{ store.state }}, {{
+                        store.pincode }}<br><strong>GSTIN :</strong> {{ store.gst_number }}<br><strong>DL NO :</strong>
+                        {{ store.drug_license_number }}</div>
                 </td>
                 <td style="width: 30%; text-align: right; vertical-align: bottom;">
                     <div style="font-size: 24px; color: #ccc; font-weight: bold; margin-bottom: 5px;">TAX INVOICE</div>
@@ -125,9 +203,7 @@
                     <td>{{ forloop.counter }}</td>
                     <td>
                         <strong style="font-size: 11px; font-weight: 600;">{{ item.name }}</strong>
-                        <span style="font-size: 10px; color: #666;">
-                            &nbsp;| Batch: {{ item.batch_number }}
-                        </span>
+                        <span style="font-size: 10px; color: #666;">&nbsp;| Batch: {{ item.batch_number }}</span>
                     </td>
                     <td style="text-align: center;">{{ item.mrp }}</td>
                     <td style="text-align: center;">{{ item.qty }}</td>
@@ -153,29 +229,27 @@
             </tr>
             <tr class="total-row">
                 <td class="total-label grand-total">Net Amount Payable</td>
-                <td class="total-value grand-total">₹ {{ invoice.final_selling_price }}</td>
+                <td class="total-value grand-total">&#8377; {{ invoice.final_selling_price }}</td>
             </tr>
         </table>
 
         <div class="footer-section">
             <div class="signature-box">
                 <p style="font-size: 11px; margin-bottom: 5px;">For <strong>{{ store.store_name }}</strong></p>
-                
-                {% if signature_path %}
-                    <img src="{{ signature_path }}" class="digital-sign">
-                {% else %}
-                    <div style="height: 60px;"></div> {% endif %}
-                
+                {% if signature_path %}<img src="{{ signature_path }}" class="digital-sign">{% endif %}
+                {% if not signature_path %}<div style="height: 60px;"></div>{% endif %}
                 <div class="sign-text" style="margin-top: 10px;">Authorized Signatory</div>
                 <p style="font-size: 11px; color: #777; margin: 0;">({{ store.owner_name }})</p>
             </div>
 
             <div class="footer-note">
                 <strong>Thanks Note:</strong><br>
-                {{ store.invoice_footer_note|default:"1. Goods once sold will not be taken back. 2. Subject to local jurisdiction." }}
+                {{ store.invoice_footer_note|default:"1. Goods once sold will not be taken back. 2. Subject to local
+                jurisdiction." }}
             </div>
         </div>
 
     </div>
 </body>
+
 </html>
