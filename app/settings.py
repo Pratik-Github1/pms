@@ -30,9 +30,7 @@ else:
     raise Exception(f"Unknown ENV_TYPE: {ENV_TYPE}")
 
 DEBUG = os.getenv('DEBUG', default=True)
-SECRET_KEY = os.getenv('SECRET_KEY')
-if not SECRET_KEY:
-    raise ValueError("SECRET_KEY not set in environment variables")
+SECRET_KEY = '4x4@b&v*7e4gaw)cgmcuk-07z2v28&qwwbsd+v=t=9i6@9yl@#'
 
 ALLOWED_HOSTS = ['*']
 
@@ -174,7 +172,7 @@ DATABASES = {
             'USER': 'root',
             'PASSWORD': "",
             'HOST': 'localhost',
-            'PORT': '3307',
+            'PORT': '3306',
             'OPTIONS': {
                 'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
             }

@@ -231,46 +231,72 @@ class SalesInvoiceCRUDView(APIView):
             with transaction.atomic():
                 invoice = SalesInvoice.objects.select_for_update().get(id=invoice_id)
 
-                # Update header fields
+                # -----------------------------
+                # Update invoice header
+                # -----------------------------
                 invoice.customer_name = data.get("customer_name", invoice.customer_name)
                 invoice.doctor_name = data.get("doctor_name", invoice.doctor_name)
                 invoice.payment_mode = data.get("payment_mode", invoice.payment_mode)
                 invoice.save()
 
                 if new_items:
-                    # 1. Reverse old stock first
+                    # -----------------------------
+                    # 1. Reverse old stock
+                    # -----------------------------
                     old_items = SalesInvoiceItem.objects.filter(sales_invoice_id=invoice.id)
                     for old_item in old_items:
                         med = MedicineInventory.objects.select_for_update().get(id=old_item.medicine_id)
-                        med.current_stock += old_item.quantity # Add back sold items
+                        med.current_stock += old_item.quantity
                         med.save()
-                    
+
                     old_items.delete()
 
-                    # 2. Apply new items (Same logic as POST)
-                    total_price = 0
+                    # -----------------------------
+                    # 2. Apply updated items
+                    # -----------------------------
+                    total_mrp = 0
+                    total_discount = 0
+                    final_selling = 0
+
                     for item in new_items:
-                        med = MedicineInventory.objects.select_for_update().get(id=item['medicine_id'])
-                        qty = int(item['quantity'])
-                        
+                        med = MedicineInventory.objects.select_for_update().get(
+                            id=item["medicine_id"]
+                        )
+
+                        qty = int(item["quantity"])
+                        mrp = float(item.get("mrp", med.mrp))
+                        discount = float(item.get("discount", 0))
+                        selling_price = float(item.get("selling_price", mrp * qty))
+
                         if med.current_stock < qty:
                             raise ValueError(f"Insufficient stock for {med.name}")
+
+                        line_mrp = mrp * qty
+                        discount_price = line_mrp - selling_price
 
                         SalesInvoiceItem.objects.create(
                             sales_invoice_id=invoice.id,
                             medicine_id=med.id,
                             quantity=qty,
-                            mrp=item.get('mrp', med.mrp),
-                            discount=item.get('discount', 0),
-                            discount_price=0, # Simplified for brevity, recalculate as per POST
-                            selling_price=item.get('mrp', med.mrp) * qty
+                            mrp=mrp,
+                            discount=discount,
+                            discount_price=discount_price,
+                            selling_price=selling_price
                         )
+
                         med.current_stock -= qty
                         med.save()
-                        total_price += (float(item.get('mrp', med.mrp)) * qty)
 
-                    invoice.total_price = total_price
-                    invoice.final_selling_price = total_price # Minus discounts
+                        total_mrp += line_mrp
+                        total_discount += discount_price
+                        final_selling += selling_price
+
+                    # -----------------------------
+                    # 3. Update invoice totals
+                    # -----------------------------
+                    invoice.total_price = total_mrp
+                    invoice.total_discount_price = total_discount
+                    invoice.final_selling_price = final_selling
                     invoice.save()
 
             response_data["status"] = True

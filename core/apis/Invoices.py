@@ -27,6 +27,7 @@ class InvoiceGenerate(APIView):
                 med = MedicineInventory.objects.filter(id=item.medicine_id).first()
                 enriched_items.append({
                     'name': med.name if med else "Unknown Medicine",
+                    'batch_number': med.batch_number if med and med.batch_number else "N/A",
                     'qty': item.quantity,
                     'mrp': item.mrp,
                     'discount': item.discount,
@@ -50,7 +51,10 @@ class InvoiceGenerate(APIView):
                 'margin-bottom': '0.5in',
                 'margin-left': '0.5in',
                 'encoding': "UTF-8",
-                'enable-local-file-access': None # Required to read signature_path
+                'enable-local-file-access': None,
+                'no-outline': None,
+                'disable-smart-shrinking': None, # This prevents "tight" text rendering
+                'dpi': '300', # Higher DPI often clears up letter spacing
             }
             
             config = pdfkit.configuration(wkhtmltopdf=settings.PATH_WKHTMLTOPDF)

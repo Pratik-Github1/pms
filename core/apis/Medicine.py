@@ -24,7 +24,7 @@ class MedicineCRUDView(APIView):
         required_fields = [
             "name", "batch_number", "current_stock",
             "expiry_date", "packing_details", "rack_location",
-            "purchase_price", "mrp"
+            "mrp"
         ]
 
         missing_fields = [
@@ -51,7 +51,6 @@ class MedicineCRUDView(APIView):
                     batch_number=data.get("batch_number"),
                     expiry_date=data.get("expiry_date"),
                     rack_location=data.get("rack_location"),
-                    purchase_price=data.get("purchase_price"),
                     mrp=data.get("mrp"),
                     current_stock=data.get("current_stock"),
                     is_active=True,
@@ -228,7 +227,8 @@ class GetMedicineInventoryListSmall(APIView):
             "id",
             "name",
             "mrp",
-            "rack_location"
+            "rack_location",
+            "batch_number"
         ).order_by("-id")
 
         return JsonResponse({

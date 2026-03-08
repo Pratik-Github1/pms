@@ -43,7 +43,7 @@
                         <table class="table table-bordered" id="salesTable">
                             <thead class="bg-light">
                                 <tr>
-                                    <th style="width: 35%;">Medicine (Name - Rack)</th>
+                                    <th style="width: 35%;">Medicine (Name - Rack - Batch)</th>
                                     <th>MRP</th>
                                     <th>Qty</th>
                                     <th>Discount (%)</th>
@@ -146,9 +146,21 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function addItemRow(data = {}) {
         let options = `<option value="">Select Medicine</option>`;
+
         MEDICINES.forEach(m => {
             const selected = data.medicine_id == m.id ? "selected" : "";
-            options += `<option value="${m.id}" data-mrp="${m.mrp}" ${selected}>${m.name} - ${m.rack_location || 'N/A'}</option>`;
+
+            const rack = m.rack_location || "N/A";
+            const batch = m.batch_number || "N/A";
+
+            options += `
+                <option value="${m.id}" data-mrp="${m.mrp}" ${selected}>
+                    ${m.name}
+                    <span style="font-size: 11px; color: #666;">
+                        - ${rack} - ${batch}
+                    </span>
+                </option>
+            `;
         });
 
         const rowHtml = `
@@ -158,12 +170,17 @@ document.addEventListener("DOMContentLoaded", function () {
                 <td><input type="number" class="form-control quantity" value="${data.quantity || ""}" min="1" required></td>
                 <td><input type="number" step="0.01" class="form-control discount" value="${data.discount || 0}" min="0" max="20"></td>
                 <td><input type="number" step="0.01" class="form-control selling_price" value="${data.selling_price || ""}" readonly></td>
-                <td class="text-center"><button type="button" class="btn btn-sm btn-danger removeBtn">×</button></td>
+                <td class="text-center">
+                    <button type="button" class="btn btn-sm btn-danger removeBtn">×</button>
+                </td>
             </tr>
         `;
+
         itemsBody.insertAdjacentHTML("beforeend", rowHtml);
-        if(data.medicine_id) calculateRow(itemsBody.lastElementChild);
+
+        if (data.medicine_id) calculateRow(itemsBody.lastElementChild);
     }
+
 
     itemsBody.addEventListener("change", e => {
         if (e.target.classList.contains("medicine_id")) {

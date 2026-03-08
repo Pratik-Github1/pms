@@ -86,12 +86,12 @@
                                 <input type="text" class="form-control" id="rack_location" placeholder="Rack Location" required>
                             </div>
                         </div>
-                        <div class="col-md-4">
+                        <!-- <div class="col-md-4">
                             <div class="form-group">
                                 <label>Purchase Price <span class="text-danger">*</span></label>
                                 <input type="number" step="0.01" class="form-control" id="purchase_price" placeholder="Purchase Price" required>
                             </div>
-                        </div>
+                        </div> -->
                         <div class="col-md-4">
                             <div class="form-group">
                                 <label>MRP <span class="text-danger">*</span></label>
@@ -169,7 +169,6 @@ document.addEventListener("DOMContentLoaded", function () {
             packing_details: document.getElementById("packing_details").value.trim(),
             unit: document.getElementById("unit").value,
             rack_location: document.getElementById("rack_location").value.trim(),
-            purchase_price: document.getElementById("purchase_price").value,
             mrp: document.getElementById("mrp").value,
             medicine_uses: document.getElementById("medicine_uses").value.trim()
         };

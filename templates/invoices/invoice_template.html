@@ -3,12 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <style>
-        body { font-family: 'Helvetica', 'Arial', sans-serif; color: #222; margin: 0; padding: 0; line-height: 1.5; }
+        /* ADDED: letter-spacing and text-rendering to solve the "close letters" issue */
+        body { 
+            font-family: 'Helvetica', 'Arial', sans-serif; 
+            color: #222; 
+            margin: 0; 
+            padding: 0; 
+            line-height: 1.5; 
+            letter-spacing: 0.02em; 
+            text-rendering: optimizeLegibility;
+        }
         .invoice-container { padding: 40px; }
         
         /* Header Section */
         .header-table { width: 100%; border-bottom: 2px solid #333; margin-bottom: 20px; padding-bottom: 10px; }
-        .store-title { font-size: 28px; font-weight: bold; color: #1a73e8; margin: 0; }
+        .store-title { font-size: 28px; font-weight: bold; color: #2e7d32; margin: 0; }
         .store-details { font-size: 11px; color: #555; margin-top: 5px; }
         
         /* Layout Grid */
@@ -114,7 +123,12 @@
                 {% for item in items %}
                 <tr>
                     <td>{{ forloop.counter }}</td>
-                    <td><strong>{{ item.name }}</strong></td>
+                    <td>
+                        <strong style="font-size: 11px; font-weight: 600;">{{ item.name }}</strong>
+                        <span style="font-size: 10px; color: #666;">
+                            &nbsp;| Batch: {{ item.batch_number }}
+                        </span>
+                    </td>
                     <td style="text-align: center;">{{ item.mrp }}</td>
                     <td style="text-align: center;">{{ item.qty }}</td>
                     <td style="text-align: center;">{{ item.discount }}</td>
@@ -157,7 +171,7 @@
             </div>
 
             <div class="footer-note">
-                <strong>Terms & Conditions:</strong><br>
+                <strong>Thanks Note:</strong><br>
                 {{ store.invoice_footer_note|default:"1. Goods once sold will not be taken back. 2. Subject to local jurisdiction." }}
             </div>
         </div>
