@@ -1,0 +1,187 @@
+{% extends "base.html" %}
+{% block title %}Expiry Returns | Panda Medicine{% endblock %}
+{% block content %}
+
+<style>
+    .table th {
+        font-size: 13px;
+    }
+
+    .table td {
+        font-size: 13px;
+        vertical-align: middle;
+    }
+
+    .badge-returned {
+        background-color: #28a745;
+        color: #fff;
+    }
+
+    .badge-pending {
+        background-color: #fd7e14;
+        color: #fff;
+    }
+</style>
+
+<div class="page-header d-flex justify-content-between align-items-center">
+    <h3 class="page-title mb-0">Expiry Returns</h3>
+    <button class="btn btn-gradient-primary btn-sm" onclick="window.location.href='/createExpiryReturn/'">
+        <i class="mdi mdi-plus"></i> New Expiry Return
+    </button>
+</div>
+
+<div class="row mt-3">
+    <div class="col-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <input type="text" id="searchInput" class="form-control"
+                            placeholder="Search by return number, supplier...">
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th style="width: 50px;">#</th>
+                                <th>Return No.</th>
+                                <th>Supplier</th>
+                                <th>Items</th>
+                                <th>Total (₹)</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                                <th style="width: 70px;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody">
+                            <tr>
+                                <td colspan="8" class="text-center text-muted">Loading...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center mt-3">
+                    <div id="paginationInfo" class="text-muted"></div>
+                    <ul class="pagination pagination-sm mb-0" id="pagination"></ul>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const tableBody = document.getElementById("tableBody");
+        const pagination = document.getElementById("pagination");
+        const paginationInfo = document.getElementById("paginationInfo");
+        const searchInput = document.getElementById("searchInput");
+
+        let currentPage = 1;
+        let pageSize = 10;
+        let currentSearch = "";
+
+        function formatDate(dt) {
+            if (!dt) return "-";
+            const d = new Date(dt);
+            return d.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
+        }
+
+        function fetchList(page = 1) {
+            tableBody.innerHTML = `<tr><td colspan="8" class="text-center text-muted">Loading...</td></tr>`;
+
+            const url = `/apis/expiryReturnsList?page=${page}&page_size=${pageSize}&search=${encodeURIComponent(currentSearch)}`;
+
+            fetch(url)
+                .then(r => r.json())
+                .then(response => {
+                    const data = response.results.data || [];
+                    const totalCount = response.count;
+
+                    renderTable(data, page);
+                    renderPagination(response, page);
+                    paginationInfo.textContent = `Showing ${Math.min((page - 1) * pageSize + 1, totalCount)}–${Math.min(page * pageSize, totalCount)} of ${totalCount} returns`;
+                })
+                .catch(() => {
+                    tableBody.innerHTML = `<tr><td colspan="8" class="text-center text-danger">Failed to load</td></tr>`;
+                });
+        }
+
+        function renderTable(data, page) {
+            tableBody.innerHTML = "";
+            if (!data.length) {
+                tableBody.innerHTML = `<tr><td colspan="8" class="text-center text-muted">No expiry returns found</td></tr>`;
+                return;
+            }
+
+            data.forEach((item, idx) => {
+                const statusBadge = item.is_returned
+                    ? `<span class="badge badge-returned">Returned</span>`
+                    : `<span class="badge badge-pending">Pending</span>`;
+
+                tableBody.innerHTML += `
+                <tr>
+                    <td>${(page - 1) * pageSize + idx + 1}</td>
+                    <td><strong>${item.return_number}</strong></td>
+                    <td>${item.supplier_name || "-"}</td>
+                    <td>${item.total_items}</td>
+                    <td>₹${item.total_amount}</td>
+                    <td>${formatDate(item.created_at)}</td>
+                    <td>${statusBadge}</td>
+                    <td class="text-center">
+                        <button class="btn btn-sm btn-outline-primary view-btn" data-id="${item.id}">
+                            <i class="mdi mdi-eye"></i>
+                        </button>
+                    </td>
+                </tr>
+            `;
+            });
+
+            document.querySelectorAll(".view-btn").forEach(btn => {
+                btn.addEventListener("click", function () {
+                    alert("View detail for ID: " + this.dataset.id);
+                });
+            });
+        }
+
+        function renderPagination(response, page) {
+            pagination.innerHTML = "";
+            const totalPages = Math.ceil(response.count / pageSize);
+
+            pagination.innerHTML += `<li class="page-item ${page === 1 ? "disabled" : ""}"><a class="page-link" href="#">Previous</a></li>`;
+            for (let i = 1; i <= totalPages; i++) {
+                pagination.innerHTML += `<li class="page-item ${i === page ? "active" : ""}"><a class="page-link" href="#">${i}</a></li>`;
+            }
+            pagination.innerHTML += `<li class="page-item ${page === totalPages ? "disabled" : ""}"><a class="page-link" href="#">Next</a></li>`;
+
+            Array.from(pagination.querySelectorAll(".page-link")).forEach(link => {
+                link.addEventListener("click", function (e) {
+                    e.preventDefault();
+                    if (this.textContent === "Previous" && page > 1) currentPage--;
+                    else if (this.textContent === "Next" && page < totalPages) currentPage++;
+                    else if (!isNaN(this.textContent)) currentPage = Number(this.textContent);
+                    fetchList(currentPage);
+                });
+            });
+        }
+
+        let timer = null;
+        searchInput.addEventListener("keyup", function () {
+            clearTimeout(timer);
+            timer = setTimeout(() => {
+                currentSearch = this.value.trim();
+                currentPage = 1;
+                fetchList();
+            }, 400);
+        });
+
+        fetchList();
+    });
+</script>
+
+{% endblock %}

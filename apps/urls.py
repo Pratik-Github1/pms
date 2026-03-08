@@ -21,5 +21,7 @@ urlpatterns = [
 
     path('createSalesNote/', views.createSalesInvoicePage, name='createSalesInvoice'),
     path("salesInvoiceList/", views.sales_invoice_list_page),
-    
+
+    path('createExpiryReturn/', views.createExpiryReturnPage, name='createExpiryReturn'),
+    path('expiryReturnList/', views.expiryReturnListPage, name='expiryReturnList'),
 ]

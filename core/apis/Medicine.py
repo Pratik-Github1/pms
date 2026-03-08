@@ -1,9 +1,10 @@
-from django.db.models import Q
+from django.db.models import Q, Subquery, OuterRef, CharField
+from django.db.models.functions import Coalesce
 from rest_framework import status
 from django.http import JsonResponse
 from rest_framework import serializers
 from rest_framework.views import APIView
-from apps.models import MedicineInventory
+from apps.models import MedicineInventory, PurchaseInvoiceItem, PurchaseInvoice, Supplier
 from rest_framework.permissions import AllowAny
 from django.db import transaction, IntegrityError
 from rest_framework.pagination import PageNumberPagination
@@ -133,7 +134,6 @@ class MedicineCRUDView(APIView):
                 "packing_details",
                 "low_stock_alert",
                 "rack_location",
-                "purchase_price",
                 "mrp",
                 "current_stock",
                 "is_active",
@@ -223,16 +223,37 @@ class GetMedicineInventoryListSmall(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request):
-        suppliers = MedicineInventory.objects.values(
+        # Subquery: get supplier company_name from the latest purchase invoice for each medicine
+        latest_pi = PurchaseInvoiceItem.objects.filter(
+            medicine_id=OuterRef("id")
+        ).order_by("-id").values("purchase_invoice_id")[:1]
+
+        supplier_name_sq = PurchaseInvoice.objects.filter(
+            id=Subquery(latest_pi)
+        ).values("supplier_id")[:1]
+
+        supplier_company = Supplier.objects.filter(
+            id=Subquery(supplier_name_sq)
+        ).values("company_name")[:1]
+
+        medicines = MedicineInventory.objects.filter(
+            is_active=True
+        ).annotate(
+            supplier_name=Coalesce(
+                Subquery(supplier_company, output_field=CharField()),
+                None
+            )
+        ).values(
             "id",
             "name",
             "mrp",
             "rack_location",
-            "batch_number"
-        ).order_by("-id")
+            "current_stock",
+            "supplier_name"
+        ).order_by("name")
 
         return JsonResponse({
             "status": True,
-            "message": "Supplier list fetched successfully.",
-            "data": list(suppliers)
+            "message": "Medicine list fetched successfully.",
+            "data": list(medicines)
         })

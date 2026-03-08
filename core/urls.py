@@ -9,6 +9,8 @@ from core.apis.Medicine import *
 from core.apis.Supplier import *
 from core.apis.Purchases import *
 from core.apis.Invoices import *
+from core.apis.Dashboard import DashboardStatsView
+from core.apis.ExpiryReturn import ExpiryReturnCRUDView, ExpiryReturnListView
 
 app_name = "core"
 
@@ -17,6 +19,8 @@ urlpatterns = [
     path('login', LoginView.as_view(), name='login'),
     path('generateAccessToken', GenerateAccessToken.as_view(), name='generateAccessToken'),
     path('logout', UserLogoutView.as_view(), name='logout'),
+
+    path('dashboardStats', DashboardStatsView.as_view(), name='dashboardStats'),
 
     path('getStoreInformation', GETStoreProfileInformation.as_view(), name='getStoreInformation'),
     path('storeInformation', StoreProfileCRUDView.as_view(), name='storeInformation'),
@@ -37,6 +41,8 @@ urlpatterns = [
 
     path('generateInvoice', InvoiceGenerate.as_view(), name='generateInvoice'),
 
+    path('expiryReturns', ExpiryReturnCRUDView.as_view(), name='expiryReturns'),
+    path('expiryReturnsList', ExpiryReturnListView.as_view(), name='expiryReturnsList'),
 ]
 
 if settings.DEBUG:

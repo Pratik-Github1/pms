@@ -74,7 +74,6 @@ class PurchaseInvoiceCRUDView(APIView):
                 for index, item in enumerate(items, start=1):
                     medicine_id = item.get("medicine_id")
                     quantity = item.get("quantity")
-                    purchase_price = item.get("purchase_price")
                     mrp = item.get("mrp")
 
                     if not medicine_id or not quantity:
@@ -86,24 +85,17 @@ class PurchaseInvoiceCRUDView(APIView):
                         purchase_invoice_id=invoice.id,
                         medicine_id=medicine_id,
                         quantity=quantity,
-                        purchase_price=purchase_price,
                         mrp=mrp,
                     )
 
                     # Stock Inward
                     medicine.current_stock += int(quantity)
-
-                    if purchase_price is not None:
-                        medicine.purchase_price = purchase_price
                     if mrp is not None:
                         medicine.mrp = mrp
+                    medicine.save(update_fields=["current_stock", "mrp"])
 
-                    medicine.save(update_fields=[
-                        "current_stock", "purchase_price", "mrp"
-                    ])
-
-                    if purchase_price:
-                        total_amount += int(quantity) * float(purchase_price)
+                    if mrp:
+                        total_amount += int(quantity) * float(mrp)
 
                 invoice.total_amount = total_amount
                 invoice.save(update_fields=["total_amount"])
@@ -167,7 +159,6 @@ class PurchaseInvoiceCRUDView(APIView):
                     {
                         "medicine_id": item.medicine_id,
                         "quantity": item.quantity,
-                        "purchase_price": item.purchase_price,
                         "mrp": item.mrp,
                     }
                     for item in items
@@ -274,7 +265,6 @@ class PurchaseInvoiceCRUDView(APIView):
                 for index, item in enumerate(new_items, start=1):
                     medicine_id = item.get("medicine_id")
                     quantity = item.get("quantity")
-                    purchase_price = item.get("purchase_price")
                     mrp = item.get("mrp")
 
                     if not medicine_id or not quantity:
@@ -288,24 +278,17 @@ class PurchaseInvoiceCRUDView(APIView):
                         purchase_invoice_id=invoice.id,
                         medicine_id=medicine_id,
                         quantity=quantity,
-                        purchase_price=purchase_price,
                         mrp=mrp,
                     )
 
                     # Apply new stock
                     medicine.current_stock += int(quantity)
-
-                    if purchase_price is not None:
-                        medicine.purchase_price = purchase_price
                     if mrp is not None:
                         medicine.mrp = mrp
+                    medicine.save(update_fields=["current_stock", "mrp"])
 
-                    medicine.save(update_fields=[
-                        "current_stock", "purchase_price", "mrp"
-                    ])
-
-                    if purchase_price:
-                        total_amount += int(quantity) * float(purchase_price)
+                    if mrp:
+                        total_amount += int(quantity) * float(mrp)
 
                 invoice.total_amount = total_amount
                 invoice.save(update_fields=["total_amount"])

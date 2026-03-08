@@ -1,10 +1,106 @@
 {% extends "base.html" %}
 {% block title %}Create Purchase Note | Panda Medicine{% endblock %}
 {% block content %}
+
 <style>
-    #itemsBody select,
-    #itemsBody input {
+    .search-select-wrapper {
+        position: relative;
+    }
+
+    .search-select-wrapper input.search-input {
+        width: 100%;
+        padding: 6px 10px;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
         font-size: 13px;
+        background: #fff;
+    }
+
+    .search-select-wrapper .dropdown-list {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        z-index: 999;
+        max-height: 220px;
+        overflow-y: auto;
+        background: #fff;
+        border: 1px solid #ced4da;
+        border-top: none;
+        border-radius: 0 0 4px 4px;
+        display: none;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, .1);
+    }
+
+    .search-select-wrapper .dropdown-list .dd-item {
+        padding: 7px 10px;
+        cursor: pointer;
+        font-size: 13px;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    .search-select-wrapper .dropdown-list .dd-item:hover {
+        background: #e9f5ff;
+    }
+
+    .search-select-wrapper .dropdown-list .dd-item .med-name {
+        font-weight: 600;
+        color: #333;
+    }
+
+    .search-select-wrapper .dropdown-list .dd-item .med-meta {
+        font-size: 11px;
+        color: #888;
+        margin-top: 2px;
+    }
+
+    .search-select-wrapper .dropdown-list .dd-item .stock-badge {
+        display: inline-block;
+        padding: 1px 6px;
+        border-radius: 3px;
+        font-size: 10px;
+        font-weight: 600;
+    }
+
+    .stock-ok {
+        background: #d4edda;
+        color: #155724;
+    }
+
+    .stock-low {
+        background: #fff3cd;
+        color: #856404;
+    }
+
+    .stock-out {
+        background: #f8d7da;
+        color: #721c24;
+    }
+
+    #purchaseItemsTable th {
+        font-size: 13px;
+        white-space: nowrap;
+        vertical-align: middle;
+    }
+
+    #purchaseItemsTable td {
+        vertical-align: middle;
+    }
+
+    #purchaseItemsTable input,
+    #purchaseItemsTable select {
+        font-size: 13px;
+    }
+
+    .qty-input {
+        width: 90px;
+        text-align: center;
+        font-size: 14px !important;
+        padding: 6px 8px;
+    }
+
+    .price-input {
+        width: 120px;
     }
 </style>
 
@@ -19,10 +115,7 @@
 
                 <div class="d-flex justify-content-between align-items-center mb-2">
                     <div id="formAlert" class="alert d-none" role="alert"></div>
-
-                    <button type="button"
-                            id="editBtn"
-                            class="btn btn-sm btn-outline-primary d-none ms-auto">
+                    <button type="button" id="editBtn" class="btn btn-sm btn-outline-primary d-none ms-auto">
                         <i class="mdi mdi-pencil"></i> Edit
                     </button>
                 </div>
@@ -31,26 +124,25 @@
 
                     <!-- Invoice Header -->
                     <div class="row">
-                        <div class="col-md-4">
-                            <label>Supplier</label>
+                        <div class="col-md-4 form-group">
+                            <label>Supplier <span class="text-danger">*</span></label>
                             <select class="form-control" id="supplier_id">
-                                <option value="13">Supplier #13</option>
+                                <option value="">Select Supplier</option>
                             </select>
                         </div>
-
-                        <div class="col-md-4">
-                            <label>Invoice Number</label>
-                            <input type="text" class="form-control" id="invoice_number" required>
+                        <div class="col-md-4 form-group">
+                            <label>Invoice Number <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="invoice_number"
+                                placeholder="Supplier invoice number" required>
                         </div>
-
-                        <div class="col-md-4">
-                            <label>Invoice Date</label>
+                        <div class="col-md-4 form-group">
+                            <label>Invoice Date <span class="text-danger">*</span></label>
                             <input type="date" class="form-control" id="invoice_date" required>
                         </div>
                     </div>
 
-                    <div class="row mt-3">
-                        <div class="col-md-4">
+                    <div class="row mt-2">
+                        <div class="col-md-4 form-group">
                             <label>Payment Mode</label>
                             <select class="form-control" id="payment_mode">
                                 <option value="Cash">Cash</option>
@@ -58,15 +150,13 @@
                                 <option value="Credit">Credit</option>
                             </select>
                         </div>
-
-                        <div class="col-md-4">
-                            <label>Amount Paid</label>
-                            <input type="number" step="0.01" class="form-control" id="amount_paid">
+                        <div class="col-md-4 form-group">
+                            <label>Amount Paid (₹)</label>
+                            <input type="number" step="0.01" class="form-control" id="amount_paid" placeholder="0.00">
                         </div>
-
-                        <div class="col-md-4">
+                        <div class="col-md-4 form-group">
                             <label>Remarks</label>
-                            <input type="text" class="form-control" id="remarks">
+                            <input type="text" class="form-control" id="remarks" placeholder="Any remarks...">
                         </div>
                     </div>
 
@@ -75,27 +165,28 @@
                     <!-- Items -->
                     <h5>Purchase Items</h5>
 
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th>Medicine</th>
-                                <th>Qty</th>
-                                <th>Purchase Price</th>
-                                <th>MRP</th>
-                                <th style="width: 50px;"></th>
-                            </tr>
-                        </thead>
-                        <tbody id="itemsBody"></tbody>
-                    </table>
+                    <div class="table-responsive">
+                        <table class="table table-bordered" id="purchaseItemsTable">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th style="width: 45%;">Medicine</th>
+                                    <th>Quantity</th>
+                                    <th>MRP (₹)</th>
+                                    <th style="width: 50px;"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="itemsBody"></tbody>
+                        </table>
+                    </div>
 
-                    <button type="button" class="btn btn-sm btn-outline-secondary" id="addItemBtn">
-                        + Add Item
+                    <button type="button" class="btn btn-sm btn-outline-secondary mt-2" id="addItemBtn">
+                        <i class="mdi mdi-plus"></i> Add Item
                     </button>
 
                     <hr>
 
                     <button type="submit" class="btn btn-gradient-primary" id="submitBtn">
-                        Submit
+                        <i class="mdi mdi-content-save"></i> Submit Purchase
                     </button>
 
                 </form>
@@ -106,223 +197,258 @@
 </div>
 
 <script>
-document.addEventListener("DOMContentLoaded", function () {
+    document.addEventListener("DOMContentLoaded", function () {
 
-    const API_URL = "/apis/purchaseInvoices";
+        const API_URL = "/apis/purchaseInvoices";
 
-    const form = document.getElementById("purchaseForm");
-    const alertBox = document.getElementById("formAlert");
-    const editBtn = document.getElementById("editBtn");
-    const submitBtn = document.getElementById("submitBtn");
-    const itemsBody = document.getElementById("itemsBody");
-    const addItemBtn = document.getElementById("addItemBtn");
+        const form = document.getElementById("purchaseForm");
+        const alertBox = document.getElementById("formAlert");
+        const editBtn = document.getElementById("editBtn");
+        const submitBtn = document.getElementById("submitBtn");
+        const itemsBody = document.getElementById("itemsBody");
+        const addItemBtn = document.getElementById("addItemBtn");
 
-    let invoiceId = new URLSearchParams(window.location.search).get("id");
-    let isEditMode = false;
+        let invoiceId = new URLSearchParams(window.location.search).get("id");
+        let isEditMode = false;
 
-    let SUPPLIERS = [];
-    let MEDICINES = [];
+        let SUPPLIERS = [];
+        let MEDICINES = [];
+
+        function showMessage(msg, type = "success") {
+            alertBox.className = `alert alert-${type}`;
+            alertBox.textContent = msg;
+            alertBox.classList.remove("d-none");
+            window.scrollTo(0, 0);
+        }
+
+        function hideMessage() {
+            alertBox.classList.add("d-none");
+        }
+
+        function setDisabled(disabled) {
+            [...form.elements].forEach(el => {
+                if (el.tagName !== "BUTTON") el.disabled = disabled;
+            });
+            itemsBody.querySelectorAll(".search-input").forEach(el => el.disabled = disabled);
+        }
 
 
-    function showMessage(msg, type="success") {
-        alertBox.className = `alert alert-${type}`;
-        alertBox.textContent = msg;
-        alertBox.classList.remove("d-none");
-    }
 
-    function hideMessage() {
-        alertBox.classList.add("d-none");
-    }
+        function stockClass(qty) {
+            if (qty <= 0) return "stock-out";
+            if (qty <= 10) return "stock-low";
+            return "stock-ok";
+        }
 
-    function setDisabled(disabled) {
-        [...form.elements].forEach(el => {
-            if (el.tagName !== "BUTTON") el.disabled = disabled;
-        });
-    }
-
-    function addItemRow(data = {}) {
-
-        let medicineOptions = `<option value="">Select Medicine</option>`;
-
-        MEDICINES.forEach(med => {
-            const selected = data.medicine_id == med.id ? "selected" : "";
-            medicineOptions += `
-                <option value="${med.id}" ${selected}>
-                    ${med.name}
-                </option>
+        function buildDropdownItems(wrapper, medicines) {
+            const list = wrapper.querySelector(".dropdown-list");
+            list.innerHTML = "";
+            medicines.forEach(m => {
+                const rack = m.rack_location || "N/A";
+                const supplier = m.supplier_name || "-";
+                const stk = m.current_stock || 0;
+                const div = document.createElement("div");
+                div.className = "dd-item";
+                div.setAttribute("data-id", m.id);
+                div.setAttribute("data-name", m.name);
+                div.innerHTML = `
+                <div class="med-name">${m.name} <span class="stock-badge ${stockClass(stk)}">Stock: ${stk}</span></div>
+                <div class="med-meta">Rack: ${rack} | Supplier: ${supplier} | MRP: ₹${m.mrp}</div>
             `;
-        });
+                list.appendChild(div);
+            });
+        }
 
-        itemsBody.insertAdjacentHTML("beforeend", `
+        function initSearchDropdown(wrapper) {
+            const input = wrapper.querySelector(".search-input");
+            const list = wrapper.querySelector(".dropdown-list");
+            const hiddenInput = wrapper.querySelector(".medicine_id");
+
+            input.addEventListener("focus", () => {
+                buildDropdownItems(wrapper, MEDICINES);
+                list.style.display = "block";
+            });
+
+            input.addEventListener("input", () => {
+                const q = input.value.toLowerCase();
+                const filtered = MEDICINES.filter(m => m.name.toLowerCase().includes(q));
+                buildDropdownItems(wrapper, filtered);
+                list.style.display = "block";
+            });
+
+            list.addEventListener("click", (e) => {
+                const item = e.target.closest(".dd-item");
+                if (!item) return;
+                hiddenInput.value = item.dataset.id;
+                input.value = item.dataset.name;
+                list.style.display = "none";
+            });
+
+            document.addEventListener("click", (e) => {
+                if (!wrapper.contains(e.target)) list.style.display = "none";
+            });
+        }
+
+        function addItemRow(data = {}) {
+            const selectedMed = data.medicine_id ? MEDICINES.find(m => m.id == data.medicine_id) : null;
+            const displayName = selectedMed ? selectedMed.name : "";
+
+            itemsBody.insertAdjacentHTML("beforeend", `
             <tr>
-                <td style="min-width:180px">
-                    <select class="form-control medicine_id">
-                        ${medicineOptions}
-                    </select>
+                <td>
+                    <div class="search-select-wrapper">
+                        <input type="hidden" class="medicine_id" value="${data.medicine_id || ""}">
+                        <input type="text" class="search-input" placeholder="Type to search medicine..." value="${displayName}" autocomplete="off">
+                        <div class="dropdown-list"></div>
+                    </div>
                 </td>
-
-                <td style="width:90px">
-                    <input type="number"
-                        class="form-control quantity"
-                        value="${data.quantity || ""}">
+                <td>
+                    <input type="number" class="form-control qty-input quantity" value="${data.quantity || ""}" min="1" placeholder="0">
                 </td>
-
-                <td style="width:110px">
-                    <input type="number"
-                        step="0.01"
-                        class="form-control purchase_price"
-                        value="${data.purchase_price || ""}">
+                <td>
+                    <input type="number" step="0.01" class="form-control price-input mrp" value="${data.mrp || ""}" placeholder="0.00">
                 </td>
-
-                <td style="width:110px">
-                    <input type="number"
-                        step="0.01"
-                        class="form-control mrp"
-                        value="${data.mrp || ""}">
-                </td>
-
-                <td style="width:40px" class="text-center">
-                    <button type="button"
-                            class="btn btn-sm btn-danger removeBtn">×</button>
+                <td class="text-center">
+                    <button type="button" class="btn btn-sm btn-danger removeBtn">×</button>
                 </td>
             </tr>
         `);
-    }
 
-    function loadSuppliers() {
-        fetch("/apis/getSuppliers")
-            .then(res => res.json())
-            .then(res => {
-                if (!res.status) return;
-                SUPPLIERS = res.data;
+            const newRow = itemsBody.lastElementChild;
+            initSearchDropdown(newRow.querySelector(".search-select-wrapper"));
+        }
 
-                const supplierSelect = document.getElementById("supplier_id");
-                supplierSelect.innerHTML = `<option value="">Select Supplier</option>`;
+        function loadSuppliers() {
+            fetch("/apis/getSuppliers")
+                .then(res => res.json())
+                .then(res => {
+                    if (!res.status) return;
+                    SUPPLIERS = res.data;
 
-                SUPPLIERS.forEach(s => {
-                    supplierSelect.innerHTML += `
+                    const supplierSelect = document.getElementById("supplier_id");
+                    supplierSelect.innerHTML = `<option value="">Select Supplier</option>`;
+
+                    SUPPLIERS.forEach(s => {
+                        supplierSelect.innerHTML += `
                         <option value="${s.id}">
                             ${s.company_name || "Supplier #" + s.id}
                         </option>
                     `;
+                    });
                 });
-            });
-    }
-
-    function loadMedicines(callback = null) {
-        fetch("/apis/getMedicines")
-            .then(res => res.json())
-            .then(res => {
-                if (!res.status) return;
-                MEDICINES = res.data;
-
-                // ✅ now medicines exist
-                if (callback) callback();
-            });
-    }
-
-
-    loadSuppliers();
-    loadMedicines();
-
-
-
-    addItemBtn.onclick = () => addItemRow();
-
-    itemsBody.addEventListener("click", e => {
-        if (e.target.classList.contains("removeBtn")) {
-            e.target.closest("tr").remove();
-        }
-    });
-
-    function collectItems() {
-        return [...itemsBody.querySelectorAll("tr")].map(row => ({
-            medicine_id: row.querySelector(".medicine_id").value,
-            quantity: row.querySelector(".quantity").value,
-            purchase_price: row.querySelector(".purchase_price").value,
-            mrp: row.querySelector(".mrp").value
-        }));
-    }
-
-    if (invoiceId) {
-        fetch(`${API_URL}?id=${invoiceId}`)
-            .then(r => r.json())
-            .then(res => {
-                if (!res.status) return showMessage(res.message, "danger");
-
-                const inv = res.data.invoice;
-                document.getElementById("supplier_id").value = inv.supplier_id;
-                document.getElementById("invoice_number").value = inv.invoice_number;
-                document.getElementById("invoice_date").value = inv.invoice_date;
-                document.getElementById("payment_mode").value = inv.payment_mode;
-                document.getElementById("amount_paid").value = inv.amount_paid;
-                document.getElementById("remarks").value = inv.remarks;
-
-                loadMedicines(() => {
-                    res.data.items.forEach(addItemRow);
-                });
-
-
-                setDisabled(true);
-                submitBtn.classList.add("d-none");
-                editBtn.classList.remove("d-none");
-            });
-    } else {
-        loadMedicines(() => {
-            addItemRow();
-        });
-    }
-
-
-    editBtn.onclick = () => {
-        isEditMode = true;
-        setDisabled(false);
-        submitBtn.classList.remove("d-none");
-        editBtn.classList.add("d-none");
-    };
-
-    form.onsubmit = e => {
-        e.preventDefault();
-        hideMessage();
-
-        const payload = {
-            supplier_id: document.getElementById("supplier_id").value,
-            invoice_number: document.getElementById("invoice_number").value,
-            invoice_date: document.getElementById("invoice_date").value,
-            payment_mode: document.getElementById("payment_mode").value,
-            amount_paid: document.getElementById("amount_paid").value,
-            remarks: document.getElementById("remarks").value,
-            items: collectItems()
-        };
-
-        let method = "POST";
-        if (invoiceId && isEditMode) {
-            payload.id = invoiceId;
-            method = "PATCH";
         }
 
-        fetch(API_URL, {
-            method,
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload)
-        })
-        .then(r => r.json())
-        .then(res => {
-            if (!res.status) return showMessage(res.message, "danger");
-            showMessage(res.message);
-            if (method === "PATCH") {
-                setDisabled(true);
-                submitBtn.classList.add("d-none");
-                editBtn.classList.remove("d-none");
-            } else {
-                form.reset();
-                itemsBody.innerHTML = "";
-                addItemRow();
+        function loadMedicines(callback = null) {
+            fetch("/apis/getMedicines")
+                .then(res => res.json())
+                .then(res => {
+                    if (!res.status) return;
+                    MEDICINES = res.data;
+                    if (callback) callback();
+                });
+        }
+
+        loadSuppliers();
+
+        addItemBtn.onclick = () => addItemRow();
+
+        itemsBody.addEventListener("click", e => {
+            if (e.target.classList.contains("removeBtn")) {
+                e.target.closest("tr").remove();
             }
         });
-    };
 
-});
+        function collectItems() {
+            return [...itemsBody.querySelectorAll("tr")].map(row => ({
+                medicine_id: row.querySelector(".medicine_id").value,
+                quantity: row.querySelector(".quantity").value,
+                mrp: row.querySelector(".mrp").value
+            }));
+        }
+
+        if (invoiceId) {
+            fetch(`${API_URL}?id=${invoiceId}`)
+                .then(r => r.json())
+                .then(res => {
+                    if (!res.status) return showMessage(res.message, "danger");
+
+                    const inv = res.data.invoice;
+                    document.getElementById("supplier_id").value = inv.supplier_id;
+                    document.getElementById("invoice_number").value = inv.invoice_number;
+                    document.getElementById("invoice_date").value = inv.invoice_date;
+                    document.getElementById("payment_mode").value = inv.payment_mode;
+                    document.getElementById("amount_paid").value = inv.amount_paid;
+                    document.getElementById("remarks").value = inv.remarks;
+
+                    loadMedicines(() => {
+                        res.data.items.forEach(addItemRow);
+                    });
+
+                    setDisabled(true);
+                    submitBtn.classList.add("d-none");
+                    editBtn.classList.remove("d-none");
+                });
+        } else {
+            loadMedicines(() => {
+                addItemRow();
+            });
+        }
+
+        editBtn.onclick = () => {
+            isEditMode = true;
+            setDisabled(false);
+            submitBtn.classList.remove("d-none");
+            editBtn.classList.add("d-none");
+        };
+
+        form.onsubmit = e => {
+            e.preventDefault();
+            hideMessage();
+
+            const payload = {
+                supplier_id: document.getElementById("supplier_id").value,
+                invoice_number: document.getElementById("invoice_number").value,
+                invoice_date: document.getElementById("invoice_date").value,
+                payment_mode: document.getElementById("payment_mode").value,
+                amount_paid: document.getElementById("amount_paid").value,
+                remarks: document.getElementById("remarks").value,
+                items: collectItems()
+            };
+
+            let method = "POST";
+            if (invoiceId && isEditMode) {
+                payload.id = invoiceId;
+                method = "PATCH";
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = "Processing...";
+
+            fetch(API_URL, {
+                method,
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            })
+                .then(r => r.json())
+                .then(res => {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="mdi mdi-content-save"></i> Submit Purchase';
+
+                    if (!res.status) return showMessage(res.message, "danger");
+                    showMessage(res.message);
+                    if (method === "PATCH") {
+                        setDisabled(true);
+                        submitBtn.classList.add("d-none");
+                        editBtn.classList.remove("d-none");
+                    } else {
+                        form.reset();
+                        itemsBody.innerHTML = "";
+                        addItemRow();
+                    }
+                });
+        };
+
+    });
 </script>
 
 {% endblock %}

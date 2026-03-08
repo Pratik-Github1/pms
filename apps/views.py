@@ -42,3 +42,9 @@ def createSalesInvoicePage(request):
 
 def sales_invoice_list_page(request):
     return render(request, "sales/sales_note_list.html")
+
+def createExpiryReturnPage(request):
+    return render(request, "expiry/create_expiry_return.html")
+
+def expiryReturnListPage(request):
+    return render(request, "expiry/expiry_return_list.html")
